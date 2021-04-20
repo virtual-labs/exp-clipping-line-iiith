@@ -12,7 +12,7 @@ Two opposite corner points of the frame buffer.
     2. Compute the 4-bit codes for each endpoint.
     The codes of the vertices are computed from the below figure :
 
-<img  src="images/code-block.png">
+     <img  src="images/code-block.png">
 
      Source : From Academic Tutorials
 
