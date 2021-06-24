@@ -1,1 +1,0 @@
-Objective of this experiment is to understand the steps of a Line Clipping Algorithm, i.e., how a geometric line is clipped so as to render only the part which a user can view. As an example, we have demonstrated the steps of Cohen Sutherland Algorithm. 
