@@ -1,18 +1,27 @@
 [
-{"question":"This is a Sample Question 1?",
+{"question":"1. Which of the following conditions should hold for a line to completely be inside the clip window (code for end point 1 is c1 and for end point 2 is c2) :",
 "answers":{
-            "a":"answer1",
-            "b":"answer2",
-            "c":"answer3",
-            "d":"answer4"
+            "a":"c1 OR c2 = 0",
+            "b":"c1 AND c2 = 0",
+            "c":"c1 EXOR c2 = 1",
+            "d":" c1 OR c2 = 1"
           },
 "correctAnswer":"a"},
-{"question":"This is a Sample Question 2?",
+
+{"question":"2. Which of the following conditions should hold for a line to be trivially rejected (code for end point 1 is c1 and for end point 2 is c2) :",
 "answers":{
-            "a":"answer1",
-            "b":"answer2",
-            "c":"answer3",
-            "d":"answer4"
+            "a":"c1 AND c2 = 0",
+            "b":"c1 AND c2 != 0",
+            "c":"c1 OR c2 != 1",
+            "d":"c1 AND c2 = 1"
           },
-"correctAnswer":"c"} 
+"correctAnswer":"c"}, 
+
+{"question":"3. Do you think the same algorithm will work if the clip window is concave? ",
+"answers":{
+            "a":"Yes",
+            "b":"No"
+          },
+"correctAnswer":"c"}
+
 ]
