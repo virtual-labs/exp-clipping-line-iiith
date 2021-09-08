@@ -8,7 +8,4 @@ Some common algorithms to perform line clipping are as follows:
   b. Liang-Barsky algorithm  
   c. Nicholl-Lee-Nicholl algorithm  
 
-
 Here we have discussed only the Cohen-Sutherland Line Clipping algorithm.    
-
-Objective of this experiment is to understand the steps of a Line Clipping Algorithm, i.e., how a geometric line is clipped so as to render only the part which a user can view. As an example, we have demonstrated the steps of Cohen Sutherland Algorithm.   
