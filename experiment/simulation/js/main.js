@@ -1,1 +1,386 @@
-//Your JavaScript goes in here
+"use strict";
+// declaring the global constants
+const MAXX = 1195;
+const MINX = 60;
+const MINY = 20;
+const MAXY = 490;
+const width = 1200;
+const height = 600;
+const textHeight = 550;
+const scale = window.devicePixelRatio;
+const gridColor = "yellow";
+const lineColor = "green";
+const highlightColor = "red";
+const INSIDE = 0; // 0000
+const LEFT = 1; // 0001
+const RIGHT = 2; // 0010
+const BOTTOM = 4; // 0100
+const TOP = 8; // 1000
+// global variables
+let times_next_called = 0;
+const canvas = document.getElementById("canvas");
+// marks the 4 borders of the rectangular grid
+let left, up, right, down;
+// mark the line coordinates
+let point1 = [],
+  point2 = [];
+let first_points = [];
+let second_points = [];
+let MESSAGE = "";
+let clipEdge = "";
+let submit = false;
+const ctx = canvas.getContext("2d");
+// set the canvas properties
+// set the buttons control objects
+const nextButton = document.getElementById("next_button");
+const submitButton = document.getElementById("submit");
+const previousButton = document.getElementById("prev_button");
+const resetButton = document.getElementById("reset_button");
+
+// helper function , converting to binary representation
+function encodePoint(x, y) {
+  let code = INSIDE;
+  if (parseFloat(x) < parseFloat(left)) {
+    code |= LEFT;
+  } else if (parseFloat(x) > parseFloat(right)) {
+    code |= RIGHT;
+  }
+  if (parseFloat(y) > parseFloat(down)) {
+    code |= BOTTOM;
+  } else if (parseFloat(y) < parseFloat(up)) {
+    code |= TOP;
+  }
+  return code;
+}
+// helper function for displaying meesage on the canvas
+function canvasMessage(message) {
+  ctx.fillStyle = "black";
+  ctx.font = "16px serif";
+  ctx.clearRect(0, textHeight, canvas.width, height - textHeight);
+  ctx.rect(0, textHeight, canvas.width, height - textHeight);
+  ctx.fillText(message, width / 2, textHeight + 20);
+}
+// function to display the coordinantes on the canvas
+function coordinatesText(x, y, color) {
+  ctx.fillStyle = color;
+  ctx.font = "16px serif";
+  x = parseFloat(x);
+  y = parseFloat(y);
+
+  ctx.fillText("(" + x.toFixed(1) + "," + y.toFixed(1) + ")", x - 10, y - 10);
+}
+// function draw line between the given two points
+function drawLine(x1, y1, x2, y2, width, color) {
+  if (color === undefined || color === "") {
+    color = gridColor;
+  }
+  ctx.beginPath();
+  x1 = parseFloat(x1) + 0.5;
+  y1 = parseFloat(y1) + 0.5;
+  x2 = parseFloat(x2) + 0.5;
+  y2 = parseFloat(y2) + 0.5;
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+}
+// helper function to draw the point on the canvas
+function makePoint(x, y, dotColor, textColor) {
+  // render the point dot on the canvas
+  x = parseFloat(x);
+  y = parseFloat(y);
+  ctx.beginPath();
+  ctx.arc(x, y, 2, 0, 2 * Math.PI, false);
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = dotColor;
+  ctx.stroke();
+  ctx.beginPath();
+  // render the point coordinates on the canvas
+  coordinatesText(x, y, textColor);
+}
+// function to draw the rectangle grid on the canvas
+function drawGrid(leftColor, rightColor, bottomColor, topColor) {
+  // draw the rectangular grid lines
+  drawLine(left, 0, left, textHeight, 2, leftColor);
+  drawLine(right, 0, right, textHeight, 2, rightColor);
+  drawLine(0, down, width, down, 2, bottomColor);
+  drawLine(0, up, width, up, 2, topColor);
+  drawLine(0, textHeight, width, textHeight, 2, "black");
+  // mark the coordinates for the rectangular grid's intersection
+  makePoint(left, up, "red", "red");
+  makePoint(right, down, "red", "red");
+  makePoint(left, down, "red", "red");
+  makePoint(right, up, "red", "red");
+}
+function calculateSlope() {
+  if (point1[0] == point2[0]) {
+    if (point1[1] < point2[1]) {
+      return Number.MAX_SAFE_INTEGER;
+    } else {
+      return Number.MIN_SAFE_INTEGER;
+    }
+  }
+  return (point2[1] - point1[1]) / (point2[0] - point1[0]);
+}
+// function for clipping the points
+function clipPoint(point, edge) {
+  point[0] = parseFloat(point[0]);
+  point[1] = parseFloat(point[1]);
+  left = parseFloat(left);
+  right = parseFloat(right);
+  up = parseFloat(up);
+  down = parseFloat(down);
+  const pointCode = encodePoint(point[0], point[1]);
+  const slope = parseFloat(calculateSlope());
+  if (edge === "BOTTOM") {
+    if (pointCode & BOTTOM) {
+      if (slope !== 0) {
+        const x = point[0] + (1 / slope) * (down - point[1]);
+        const y = down;
+        return [x, y];
+      }
+    }
+  } else if (edge === "LEFT") {
+    if (pointCode & LEFT) {
+      if (
+        slope === Number.MAX_SAFE_INTEGER ||
+        slope === Number.MIN_SAFE_INTEGER
+      ) {
+        return [];
+      } else {
+        const x = left;
+        const y = point[1] + slope * (left - point[0]);
+        return [x, y];
+      }
+    }
+  } else if (edge === "RIGHT") {
+    if (pointCode & RIGHT) {
+      if (
+        slope === Number.MAX_SAFE_INTEGER ||
+        slope === Number.MIN_SAFE_INTEGER
+      ) {
+        return [];
+      } else {
+        const x = right;
+        const y = point[1] + slope * (right - point[0]);
+        return [x, y];
+      }
+    }
+  } else if (edge === "TOP") {
+    if (pointCode & TOP) {
+      if (slope !== 0) {
+        const x = point[0] + (1 / slope) * (up - point[1]);
+        const y = up;
+        return [x, y];
+      }
+    }
+  }
+  return [];
+}
+function pointBeingClipped() {
+  // whether point 1 is being clipped or the point 2
+  if (times_next_called >= 1 && times_next_called <= 8) {
+    return "point1";
+  } else if (times_next_called >= 9 && times_next_called <= 16) {
+    return "point2";
+  } else {
+    return null;
+  }
+}
+function clippingEdge() {
+  // returns the current edge against which the point is being clipped
+  const option = times_next_called % 8;
+  if (option === 1 || option === 2) {
+    return "LEFT";
+  } else if (option === 3 || option === 4) {
+    return "BOTTOM";
+  } else if (option === 5 || option === 6) {
+    return "RIGHT";
+  } else if (option === 7 || option === 0) {
+    return "TOP";
+  }
+}
+function highlightEdge(EDGE, width, color) {
+  // higlight the edge of the boundary
+  if (EDGE === "LEFT") {
+    drawLine(left, 0, left, textHeight, width, color);
+  } else if (EDGE === "RIGHT") {
+    drawLine(right, 0, right, textHeight, width, color);
+  } else if (EDGE === "BOTTOM") {
+    drawLine(MINX - 100, down, MAXX + 50, down, width, color);
+  } else if (EDGE === "TOP") {
+    drawLine(0, up, width, up, width, color);
+  }
+}
+function handleNext() {
+  const p1 = first_points[first_points.length - 1],
+    p2 = second_points[second_points.length - 1];
+  const code1 = encodePoint(p1[0], p1[1]);
+  const code2 = encodePoint(p2[0], p2[1]);
+  if (code1 == 0 && code2 == 0) {
+    MESSAGE = "Line is Clipped";
+    return;
+  } else if (code1 & code2) {
+    // both lie in the same region , no intersection with the rectangular grid
+
+    MESSAGE =
+      "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
+    return;
+  } else {
+    const point_being_clipped = pointBeingClipped();
+    if (point_being_clipped === "point1") {
+      const option = times_next_called % 8;
+      // at each odd frame highlight the edge being clipped against
+      const edge = clippingEdge();
+      if (option % 2 === 1) {
+        // highlight the edge being clipped against
+        clipEdge = edge;
+        MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
+      } else {
+        const intersection_point = clipPoint(p1, edge);
+        if (intersection_point.length === 0) {
+          first_points.push(p1);
+        } else {
+          first_points.push(intersection_point);
+        }
+        // unmark the previous highlight
+        clipEdge = "";
+      }
+    } else if (point_being_clipped === "point2") {
+      const option = times_next_called % 8;
+      const edge = clippingEdge();
+      if (option % 2 === 1) {
+        clipEdge = edge;
+        MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
+      } else {
+        const intersection_point = clipPoint(p2, edge);
+        if (intersection_point.length === 0) {
+          second_points.push(p2);
+        } else {
+          second_points.push(intersection_point);
+        }
+        clipEdge = "";
+      }
+    }
+  }
+  // clip the first point first
+  // next we clip the second point
+  console.log(times_next_called, ":", clipEdge);
+}
+function setParameters() {
+  canvas.width = Math.floor(width * scale);
+  canvas.height = Math.floor(height * scale);
+  ctx.scale(scale, scale);
+  ctx.font = "10px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  // get the parameter values from the form
+  left = document.getElementById("cnt-top-left-x").value;
+  up = document.getElementById("cnt-top-left-y").value;
+  right = document.getElementById("cnt-bottom-right-x").value;
+  down = document.getElementById("cnt-bottom-right-y").value;
+  const x1 = document.getElementById("ln-top-left-x").value;
+  const y1 = document.getElementById("ln-top-left-y").value;
+  const x2 = document.getElementById("ln-bottom-right-x").value;
+  const y2 = document.getElementById("ln-bottom-right-y").value;
+  makePoint(x1, y1, "red", "red");
+  makePoint(x2, y2, "red", "red");
+  point1 = [x1, y1];
+  point2 = [x2, y2];
+  first_points.push(point1);
+  second_points.push(point2);
+  // check if the parameters are valid or not
+}
+function renderCanvas() {
+  ctx.clearRect(0, 0, canvas.width, textHeight);
+  ctx.fillStyle = "black";
+  // again draw the grid
+  if (clipEdge == "") {
+    drawGrid();
+  } else if (clipEdge === "LEFT") {
+    drawGrid(highlightColor, gridColor, gridColor, gridColor);
+  } else if (clipEdge === "RIGHT") {
+    drawGrid(gridColor, highlightColor, gridColor, gridColor);
+  } else if (clipEdge === "BOTTOM") {
+    drawGrid(gridColor, gridColor, highlightColor, gridColor);
+  } else if (clipEdge === "TOP") {
+    drawGrid(gridColor, gridColor, gridColor, highlightColor);
+  }
+
+  // draw the line
+  drawLine(point1[0], point1[1], point2[0], point2[1], 2, "grey");
+  const activePoint1 = first_points[first_points.length - 1];
+  const activePoint2 = second_points[second_points.length - 1];
+  for (let i = 0; i < first_points.length - 1; i++) {
+    const point = first_points[i];
+    makePoint(point[0], point[1], "grey", "black");
+  }
+  for (let i = 0; i < second_points.length - 1; i++) {
+    const point = second_points[i];
+    makePoint(point[0], point[1], "grey", "grey");
+  }
+  makePoint(activePoint1[0], activePoint1[1], "red", "red");
+  makePoint(activePoint2[0], activePoint2[1], "red", "red");
+  drawLine(
+    activePoint1[0],
+    activePoint1[1],
+    activePoint2[0],
+    activePoint2[1],
+    2,
+    "green"
+  );
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, textHeight, canvas.width, canvas.height);
+  canvasMessage(MESSAGE);
+}
+// handle the submit button
+submitButton.addEventListener("click", function () {
+  // set the parameters
+  setParameters();
+  // draw the grid
+  drawGrid("yellow");
+  // draw the line between the two points
+  drawLine(point1[0], point1[1], point2[0], point2[1], 2, lineColor);
+  submit = true;
+});
+resetButton.addEventListener("click", function () {
+  // default values for the parameters
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  times_next_called = 0;
+  first_points = [];
+  second_points = [];
+  MESSAGE = "";
+  clipEdge = "";
+  point1 = [];
+  point2 = [];
+  submit = false;
+});
+nextButton.addEventListener("click", function () {
+  if (submit && times_next_called < 17) {
+    times_next_called++;
+    handleNext();
+    renderCanvas();
+  }
+});
+previousButton.addEventListener("click", function () {
+  if (times_next_called > 0 && times_next_called < 17) {
+    const point = pointBeingClipped();
+    const option = times_next_called % 8;
+    const edge = clippingEdge();
+    times_next_called--;
+    if (option % 2 === 0) {
+      // just chosen a point to render
+      if (point === "point1") {
+        first_points.pop();
+      } else {
+        second_points.pop();
+      }
+      clipEdge = edge;
+    } else {
+      // highlighted the edge
+      clipEdge = "";
+    }
+    renderCanvas();
+  }
+});
