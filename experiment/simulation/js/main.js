@@ -9,7 +9,7 @@ const height = 600;
 const textHeight = 550;
 const scale = window.devicePixelRatio;
 const gridColor = "yellow";
-const lineColor = "green";
+const lineColor = "white";
 const highlightColor = "red";
 const INSIDE = 0; // 0000
 const LEFT = 1; // 0001
@@ -36,6 +36,58 @@ const nextButton = document.getElementById("next_button");
 const submitButton = document.getElementById("submit");
 const previousButton = document.getElementById("prev_button");
 const resetButton = document.getElementById("reset_button");
+const errorx1 = document.getElementById("error-x1");
+const errory1 = document.getElementById("error-y1");
+const errory2 = document.getElementById("error-y2");
+const errorx2 = document.getElementById("error-x2");
+const errorLeft = document.getElementById("error-rect-left");
+const errorRight = document.getElementById("error-rect-right");
+const errorTop = document.getElementById("error-rect-top");
+const errorBottom = document.getElementById("error-rect-bottom");
+let valid = true;
+const pointx1 = document.getElementById("ln-top-left-x");
+const pointy1 = document.getElementById("ln-top-left-y");
+const pointx2 = document.getElementById("ln-bottom-right-x");
+const pointy2 = document.getElementById("ln-bottom-right-y");
+const leftBorder = document.getElementById("cnt-top-left-x");
+const topBorder = document.getElementById("cnt-top-left-y");
+const rightBorder = document.getElementById("cnt-bottom-right-x");
+const bottomBorder = document.getElementById("cnt-bottom-right-y");
+const EMPTY = "";
+const canvasTextAreaColor = "#f1f1f1";
+let pointsSoFar = 0;
+let pointMap = new Map();
+function formValidate(text, errorClass, elementId, minVal, maxVal) {
+  const element = document.getElementById(elementId);
+  const value = element.value;
+  if (value < minVal || value > maxVal) {
+    valid = false;
+    element.classList.add("error");
+    errorClass.style.display = "block";
+    errorClass.innerHTML = `${text}'s value must be between ${minVal} and ${maxVal}`;
+  } else {
+    valid = true;
+    element.classList.remove("error");
+    errorClass.innerHTML = EMPTY;
+    errorClass.style.display = "none";
+  }
+}
+pointx1.onchange = () =>
+  formValidate("X1", errorx1, "ln-top-left-x", MINX, MAXX);
+pointy1.onchange = () =>
+  formValidate("Y1", errory1, "ln-top-left-y", MINY, MAXY);
+pointx2.onchange = () =>
+  formValidate("X2", errorx2, "ln-bottom-right-x", MINX, MAXX);
+pointy2.onchange = () =>
+  formValidate("Y2", errory2, "ln-bottom-right-y", MINY, MAXY);
+topBorder.onchange = () =>
+  formValidate("Top", errorTop, "cnt-top-left-y", MINY, MAXY);
+leftBorder.onchange = () =>
+  formValidate("Left", errorLeft, "cnt-top-left-x", MINX, MAXX);
+rightBorder.onchange = () =>
+  formValidate("Right", errorRight, "cnt-bottom-right-x", MINX, MAXX);
+bottomBorder.onchange = () =>
+  formValidate("Bottom", errorBottom, "cnt-bottom-right-y", MINY, MAXY);
 
 // helper function , converting to binary representation
 function encodePoint(x, y) {
@@ -54,21 +106,31 @@ function encodePoint(x, y) {
 }
 // helper function for displaying meesage on the canvas
 function canvasMessage(message) {
-  ctx.fillStyle = "black";
-  ctx.font = "16px serif";
+  ctx.font = "20px serif";
   ctx.clearRect(0, textHeight, canvas.width, height - textHeight);
+  ctx.fillStyle = canvasTextAreaColor;
+  ctx.fillRect(0, textHeight, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
   ctx.rect(0, textHeight, canvas.width, height - textHeight);
   ctx.fillText(message, width / 2, textHeight + 20);
 }
 // function to display the coordinantes on the canvas
 function coordinatesText(x, y, color) {
-  ctx.fillStyle = color;
-  ctx.font = "16px serif";
+  ctx.font = "bold 20px serif";
   x = parseFloat(x);
   y = parseFloat(y);
-
-  ctx.fillText("(" + x.toFixed(1) + "," + y.toFixed(1) + ")", x - 10, y - 10);
+  ctx.fillStyle = "white";
+  const mapObject = `${x},${y}`;
+  ctx.fillText(pointMap.get(mapObject), x - 10, y - 10);
 }
+function clearTable() {
+  const table = document.getElementById("observations-table");
+  const rows = table.rows.length;
+  for (let i = 1; i < rows; i++) {
+    table.deleteRow(1);
+  }
+}
+function fillTable() {}
 // function draw line between the given two points
 function drawLine(x1, y1, x2, y2, width, color) {
   if (color === undefined || color === "") {
@@ -96,7 +158,13 @@ function makePoint(x, y, dotColor, textColor) {
   ctx.strokeStyle = dotColor;
   ctx.stroke();
   ctx.beginPath();
-  // render the point coordinates on the canvas
+  let mapObject = `${x},${y}`;
+  if (!pointMap.has(mapObject)) {
+    pointMap.set(
+      mapObject,
+      String.fromCharCode(65 + pointMap.size)
+    );
+  }
   coordinatesText(x, y, textColor);
 }
 // function to draw the rectangle grid on the canvas
@@ -266,12 +334,16 @@ function handleNext() {
   }
   // clip the first point first
   // next we clip the second point
-  console.log(times_next_called, ":", clipEdge);
 }
 function setParameters() {
   canvas.width = Math.floor(width * scale);
   canvas.height = Math.floor(height * scale);
   ctx.scale(scale, scale);
+  ctx.fillRect(0, 0, canvas.width, textHeight);
+
+  ctx.fillStyle = canvasTextAreaColor;
+  ctx.fillRect(0, textHeight, canvas.width, canvas.height);
+
   ctx.font = "10px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -292,9 +364,23 @@ function setParameters() {
   second_points.push(point2);
   // check if the parameters are valid or not
 }
+function renderObservations() {
+  // render the observations
+  clearTable();
+  const table = document.getElementById("observations-table");
+  for (const [key, value] of pointMap) {
+    const coordinate = key.split(",");
+    const x = parseFloat(coordinate[0]).toFixed(2);
+    const y = parseFloat(coordinate[1]).toFixed(2);
+    const row = table.insertRow(-1);
+    row.innerHTML = `<td>${value}</td><td>(${x},${y})</td>`;
+  }
+}
 function renderCanvas() {
   ctx.clearRect(0, 0, canvas.width, textHeight);
   ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, textHeight);
+
   // again draw the grid
   if (clipEdge == "") {
     drawGrid();
@@ -314,7 +400,7 @@ function renderCanvas() {
   const activePoint2 = second_points[second_points.length - 1];
   for (let i = 0; i < first_points.length - 1; i++) {
     const point = first_points[i];
-    makePoint(point[0], point[1], "grey", "black");
+    makePoint(point[0], point[1], "grey", "red");
   }
   for (let i = 0; i < second_points.length - 1; i++) {
     const point = second_points[i];
@@ -328,25 +414,43 @@ function renderCanvas() {
     activePoint2[0],
     activePoint2[1],
     2,
-    "green"
+    lineColor
   );
   ctx.fillStyle = "black";
-  ctx.fillRect(0, textHeight, canvas.width, canvas.height);
+  renderObservations();
   canvasMessage(MESSAGE);
 }
 // handle the submit button
 submitButton.addEventListener("click", function () {
   // set the parameters
-  setParameters();
+  pointMap = new Map();
+  times_next_called = 0;
+
+  first_points = [];
+  second_points = [];
+  MESSAGE = "";
+  clipEdge = "";
+  point1 = [];
+  pointsSoFar = 0;
+  point2 = [];
+  submit = false;
+
   // draw the grid
-  drawGrid("yellow");
-  // draw the line between the two points
-  drawLine(point1[0], point1[1], point2[0], point2[1], 2, lineColor);
-  submit = true;
+  if (valid === true) {
+    setParameters();
+    drawGrid("yellow");
+    // draw the line between the two points
+    drawLine(point1[0], point1[1], point2[0], point2[1], 2, lineColor);
+    renderObservations();
+    submit = true;
+  }
 });
 resetButton.addEventListener("click", function () {
   // default values for the parameters
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
+  clearTable();
+  pointsSoFar = 0;
   times_next_called = 0;
   first_points = [];
   second_points = [];
@@ -364,7 +468,7 @@ nextButton.addEventListener("click", function () {
   }
 });
 previousButton.addEventListener("click", function () {
-  if (times_next_called > 0 && times_next_called < 17) {
+  if (times_next_called > 0) {
     const point = pointBeingClipped();
     const option = times_next_called % 8;
     const edge = clippingEdge();
@@ -372,8 +476,16 @@ previousButton.addEventListener("click", function () {
     if (option % 2 === 0) {
       // just chosen a point to render
       if (point === "point1") {
+        const x = first_points[first_points.length - 1][0];
+        const y = first_points[first_points.length - 1][1];
+        const mapObject = `${x},${y}`;
+        pointMap.delete(mapObject);
         first_points.pop();
       } else {
+        const x = second_points[second_points.length - 1][0];
+        const y = second_points[second_points.length - 1][1];
+        const mapObject = `${x},${y}`;
+        pointMap.delete(mapObject);
         second_points.pop();
       }
       clipEdge = edge;
