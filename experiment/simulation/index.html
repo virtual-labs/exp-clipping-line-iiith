@@ -1,5 +1,240 @@
  <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/virtual-labs/virtual-style@0.0.8-b/css/style.min.css"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+
+  <body class="page has-text-centered">
+    <div class="columns is-centered is-flex">
+      <div class="column has-text-centered">
+        <div class="v-collapsible-instruction-container">
+          <div class="v-collapsible">Instructions</div>
+          <div id="procedure-message "class="v-content">
+            <p style="font-size: 0.9rem">
+              <ol>
+                <li>Use the Reset button to reset the simulation</li>
+                <li>Click on Next button to go to next iteration</li>
+                <li>Click on Previous button to go to previous iteration</li>
+                <li>
+                  Change the positions of rectangle coordinates and line
+                  coordinates
+                </li>   </ul>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div
+      class="columns is-centered is-variable is-1-mobile is-flex is-flex-wrap-wrap workspace left"
+    >
+      <div
+        id="left"
+        class="column has-text-centered is-2-desktop is-5-tablet is-5-mobile apparatus"
+      >
+        <div class="v-datalist-container">
+          <div class="v-datalist-title is-size-8-mobile">Input</div>
+          <div class="v-datalist-row">
+            <div style="float: left" class="is-size-7-mobile v-content">
+              Line Co-ordinates:
+            </div>
+            <div>
+              <div class="v-datalist-row">
+                <p class="float:is-centered">Clipping Rectangle Coordinates</p>
+                <br />
+                <div style="display: is-flex">
+                  <div class="error-text" id="error-rect-left"></div>
+                  <div class="error-text" id="error-rect-top"></div>
+    
+                  <label for="cnt-top-left-x">Left:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 20%"
+                    type="number"
+                    id="cnt-top-left-x"
+                    value="100"
+                    placeholder="X"
+                  />
+                  <label for="cnt-top-left-y">Top:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 20%"
+                    type="number"
+                    id="cnt-top-left-y"
+                    value="100"
+                    placeholder="Y"
+                  />
+                </div>
+                <br />
+                <div style="display: is-flex">
+                  <div class="error-text" id="error-rect-right"></div>
+                  <div class="error-text" id="error-rect-bottom"></div>
+    
+                  <label for="cnt-bottom-right-x">Right:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 20%"
+                    type="number"
+                    id="cnt-bottom-right-x"
+                    value="600"
+                    placeholder="X"
+                  />
+                  <label for="cnt-bottom-right-y"> Bottom:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 20%"
+                    type="number"
+                    id="cnt-bottom-right-y"
+                    value="300"
+                    placeholder="Y"
+                  />
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="is-size-7-mobile">Point 2:</p>
+              <div class="v-datalist-row" id="top-border">
+                <p style="float: is-centered">Line Co-ordinates:</p>
+                <br />
+                <div style="display: is-flex">
+                  <div class="error-text" id="error-x1"></div>
+                  <div class="error-text" id="error-y1"></div>
+                  <label for="ln-top-left-x">X1:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 30%"
+                    type="number"
+                    id="ln-top-left-x"
+                    value="50"
+                    placeholder="X"
+                  />
+                  <label for="ln-top-left-y">Y1:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 30%"
+                    type="number"
+                    id="ln-top-left-y"
+                    value="450"
+                    placeholder="Y"
+                  />
+                </div>
+                <br />
+                <div style="display: is-flex">
+                  <div class="error-text" id="error-x2"></div>
+                  <div class="error-text" id="error-y2"></div>
+                  <label for="ln-bottom-right-x">X2:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 30%"
+                    type="number"
+                    id="ln-bottom-right-x"
+                    value="1020"
+                    placeholder="X"
+                  />
+                  <label for="ln-bottom-right-y">Y2:</label>
+                  <input
+                    class="input is-small"
+                    style="width: 30%"
+                    type="number"
+                    id="ln-bottom-right-y"
+                    value="50"
+                    placeholder="Y"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="v-button is-small is-primary is-responsive"
+              style="margin: 0.5rem"
+              id="submit"
+            >
+              Submit
+            </button>
+          </div>
+          <div class="v-datalist-row" id="top-border">
+            <div class="v-datalist-title is-size-8-mobile">
+              Iteration Controls
+            </div>
+            <div
+              class="columns is-centered is-flex is-flex-wrap-wrap button-div"
+              style="margin: auto; width: auto"
+            >
+              <button
+                style="margin: 1%"
+                class="v-button next-btn is-responsive"
+                id="next_button"
+              >
+                Next
+              </button>
+              <button
+                style="margin: 1%"
+                class="v-button previous-btn is-responsive"
+                id="prev_button"
+              >
+                Prev
+              </button>
+              <button
+                style="margin: 1%"
+                class="v-button reset-btn is-responsive"
+                id="reset_button"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="column is-8-desktop is-11-tablet is-11-mobile exp">
+        <canvas
+          class="v-canvas-container"
+          id="canvas"
+          style="border: 2px solid black"
+        >
+        </canvas>
+      </div>
+
+      <div class="column is-2-desktop is-6-tablet is-6-mobile right">
+        <div class="v-datalist-container components-list">
+          <div class="v-datalist-title">Observations</div>
+          <div class="v-datalist-row">
+            <div class="v-table-wrap">
+              <table
+                id="observations-table"
+                class="table is-bordered is-fullwidth"
+              >
+                <thead id="table-head">
+                  <tr>
+                    <th colspan="1">Key</th>
+                    <th colspan="1">Coordinates</th>
+                  </tr>
+                </thead>
+                <tbody class="table-body"></tbody>
+              </table>
+            </div>
+            <div id="result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+      <script src="js/main.js "></script>
+      <script src="https://cdn.jsdelivr.net/gh/virtual-labs/virtual-style@0.0.8-b/js/script.js "></script>
+  
+  </body>
+</html>
+=======
 
 <head>
     <meta charset="utf-8">
@@ -80,3 +315,4 @@
         <script src="https://cdn.jsdelivr.net/gh/virtual-labs/virtual-style@0.0.8-b/js/script.js"></script>
     </div>
 </body>
+>>>>>>> testing
