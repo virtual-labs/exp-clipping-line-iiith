@@ -56,7 +56,10 @@ const bottomBorder = document.getElementById("cnt-bottom-right-y");
 const EMPTY = "";
 const canvasTextAreaColor = "#f1f1f1";
 let pointsSoFar = 0;
+// a map that points characters to letters
 let pointMap = new Map();
+// map that tells whether or not to show the points
+let showPoints = new Map();
 function formValidate(text, errorClass, elementId, minVal, maxVal) {
   const element = document.getElementById(elementId);
   const value = element.value;
@@ -121,7 +124,10 @@ function coordinatesText(x, y, color) {
   y = parseFloat(y);
   ctx.fillStyle = "white";
   const mapObject = `${x},${y}`;
-  ctx.fillText(pointMap.get(mapObject), x - 10, y - 10);
+  // if showPoints[mapObject] is true, then display the point
+  if (showPoints.get(mapObject)) {
+    ctx.fillText(pointMap.get(mapObject), x - 10, y - 10);
+  }
 }
 function clearTable() {
   const table = document.getElementById("observations-table");
@@ -160,10 +166,8 @@ function makePoint(x, y, dotColor, textColor) {
   ctx.beginPath();
   let mapObject = `${x},${y}`;
   if (!pointMap.has(mapObject)) {
-    pointMap.set(
-      mapObject,
-      String.fromCharCode(65 + pointMap.size)
-    );
+    pointMap.set(mapObject, String.fromCharCode(65 + pointMap.size));
+    showPoints.set(mapObject, true);
   }
   coordinatesText(x, y, textColor);
 }
@@ -307,10 +311,10 @@ function handleNext() {
         MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
       } else {
         const intersection_point = clipPoint(p1, edge);
-        if (intersection_point.length === 0) {
-          first_points.push(p1);
-        } else {
+        if (intersection_point.length !== 0) {
           first_points.push(intersection_point);
+          const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
+          showPoints.set(mapObject, true);
         }
         // unmark the previous highlight
         clipEdge = "";
@@ -323,10 +327,10 @@ function handleNext() {
         MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
       } else {
         const intersection_point = clipPoint(p2, edge);
-        if (intersection_point.length === 0) {
-          second_points.push(p2);
-        } else {
+        if (intersection_point.length !== 0) {
           second_points.push(intersection_point);
+          const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
+          showPoints.set(mapObject, true);
         }
         clipEdge = "";
       }
@@ -369,11 +373,13 @@ function renderObservations() {
   clearTable();
   const table = document.getElementById("observations-table");
   for (const [key, value] of pointMap) {
-    const coordinate = key.split(",");
-    const x = parseFloat(coordinate[0]).toFixed(2);
-    const y = parseFloat(coordinate[1]).toFixed(2);
-    const row = table.insertRow(-1);
-    row.innerHTML = `<td>${value}</td><td>(${x},${y})</td>`;
+    if (showPoints.get(key)) {
+      const coordinate = key.split(",");
+      const x = parseFloat(coordinate[0]).toFixed(2);
+      const y = parseFloat(coordinate[1]).toFixed(2);
+      const row = table.insertRow(-1);
+      row.innerHTML = `<td>${value}</td><td>(${x},${y})</td>`;
+    }
   }
 }
 function renderCanvas() {
@@ -459,9 +465,11 @@ resetButton.addEventListener("click", function () {
   point1 = [];
   point2 = [];
   submit = false;
+  showPoints = new Map();
+  pointMap = new Map();
 });
 nextButton.addEventListener("click", function () {
-  if (submit && times_next_called < 17) {
+  if (submit) {
     times_next_called++;
     handleNext();
     renderCanvas();
@@ -475,17 +483,17 @@ previousButton.addEventListener("click", function () {
     times_next_called--;
     if (option % 2 === 0) {
       // just chosen a point to render
-      if (point === "point1") {
+      if (point === "point1" && first_points.length > 1) {
         const x = first_points[first_points.length - 1][0];
         const y = first_points[first_points.length - 1][1];
         const mapObject = `${x},${y}`;
-        pointMap.delete(mapObject);
+        showPoints.set(mapObject, false);
         first_points.pop();
-      } else {
+      } else if (point === "point2" && second_points.length > 1) {
         const x = second_points[second_points.length - 1][0];
         const y = second_points[second_points.length - 1][1];
         const mapObject = `${x},${y}`;
-        pointMap.delete(mapObject);
+        showPoints.set(mapObject, false);
         second_points.pop();
       }
       clipEdge = edge;
