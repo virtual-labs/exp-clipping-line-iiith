@@ -285,6 +285,30 @@ function highlightEdge(EDGE, width, color) {
     drawLine(0, up, width, up, width, color);
   }
 }
+function chooseCanvasMessage() {
+  const p1 = first_points[first_points.length - 1],
+    p2 = second_points[second_points.length - 1];
+  const code1 = encodePoint(p1[0], p1[1]);
+  const code2 = encodePoint(p2[0], p2[1]);
+  if (code1 == 0 && code2 == 0) {
+    MESSAGE = "Line is Clipped";
+    return;
+  } else if (code1 & code2) {
+    // both lie in the same region , no intersection with the rectangular grid
+    MESSAGE =
+      "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
+    return;
+  } else {
+    const point_being_clipped = pointBeingClipped();
+    const option = times_next_called % 8;
+    const edge = clippingEdge();
+    if (option % 2 === 1) {
+      MESSAGE = `Clipping ${point_being_clipped} against ${edge} edge`;
+    } else {
+      MESSAGE = "";
+    }
+  }
+}
 function handleNext() {
   const p1 = first_points[first_points.length - 1],
     p2 = second_points[second_points.length - 1];
@@ -308,7 +332,6 @@ function handleNext() {
       if (option % 2 === 1) {
         // highlight the edge being clipped against
         clipEdge = edge;
-        MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
       } else {
         const intersection_point = clipPoint(p1, edge);
         if (intersection_point.length !== 0) {
@@ -324,7 +347,6 @@ function handleNext() {
       const edge = clippingEdge();
       if (option % 2 === 1) {
         clipEdge = edge;
-        MESSAGE = `Clipping ${point_being_clipped} against Edge : ${edge}`;
       } else {
         const intersection_point = clipPoint(p2, edge);
         if (intersection_point.length !== 0) {
@@ -424,6 +446,7 @@ function renderCanvas() {
   );
   ctx.fillStyle = "black";
   renderObservations();
+  chooseCanvasMessage();
   canvasMessage(MESSAGE);
 }
 // handle the submit button
