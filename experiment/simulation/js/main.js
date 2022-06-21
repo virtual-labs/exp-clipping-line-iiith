@@ -502,6 +502,9 @@ resetButton.addEventListener("click", function () {
 });
 nextButton.addEventListener("click", function () {
   if (submit && times_next_called < 16) {
+    if (times_next_called < 0) {
+      times_next_called = 0;
+    }
     times_next_called++;
 
     handleNext();
@@ -509,7 +512,7 @@ nextButton.addEventListener("click", function () {
   }
 });
 previousButton.addEventListener("click", function () {
-  if (times_next_called > 0) {
+  if (times_next_called >= 0) {
     const point = pointBeingClipped();
     const option = times_next_called % 8;
     const edge = clippingEdge();
@@ -527,12 +530,10 @@ previousButton.addEventListener("click", function () {
         } else if (edge === "TOP" && y !== up) {
         } else {
           const mapObject = `${x},${y}`;
-          console.log("point1", pointMap[mapObject]);
           showPoints.set(mapObject, false);
           first_points.pop();
         }
       } else if (point === "point2" && second_points.length > 1) {
-        clipEdge = edge;
         if (second_points[second_points.length - 1].length === 2) {
           const x = second_points[second_points.length - 1][0];
           const y = second_points[second_points.length - 1][1];
@@ -542,7 +543,6 @@ previousButton.addEventListener("click", function () {
           } else if (edge === "TOP" && y !== up) {
           } else {
             const mapObject = `${x},${y}`;
-            console.log("point2", pointMap.get(mapObject));
             showPoints.set(mapObject, false);
             second_points.pop();
           }
