@@ -310,6 +310,9 @@ function chooseCanvasMessage() {
   }
 }
 function handleNext() {
+  if (times_next_called > 16) {
+    return;
+  }
   const p1 = first_points[first_points.length - 1],
     p2 = second_points[second_points.length - 1];
   const code1 = encodePoint(p1[0], p1[1]);
@@ -338,6 +341,7 @@ function handleNext() {
           first_points.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
+        } else {
         }
         // unmark the previous highlight
         clipEdge = "";
@@ -353,6 +357,7 @@ function handleNext() {
           second_points.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
+        } else {
         }
         clipEdge = "";
       }
@@ -428,11 +433,15 @@ function renderCanvas() {
   const activePoint2 = second_points[second_points.length - 1];
   for (let i = 0; i < first_points.length - 1; i++) {
     const point = first_points[i];
-    makePoint(point[0], point[1], "grey", "red");
+    if (point.length !== 0) {
+      makePoint(point[0], point[1], "grey", "red");
+    }
   }
   for (let i = 0; i < second_points.length - 1; i++) {
     const point = second_points[i];
-    makePoint(point[0], point[1], "grey", "grey");
+    if (point.length !== 0) {
+      makePoint(point[0], point[1], "grey", "grey");
+    }
   }
   makePoint(activePoint1[0], activePoint1[1], "red", "red");
   makePoint(activePoint2[0], activePoint2[1], "red", "red");
@@ -492,8 +501,9 @@ resetButton.addEventListener("click", function () {
   pointMap = new Map();
 });
 nextButton.addEventListener("click", function () {
-  if (submit) {
+  if (submit && times_next_called < 16) {
     times_next_called++;
+
     handleNext();
     renderCanvas();
   }
@@ -504,26 +514,46 @@ previousButton.addEventListener("click", function () {
     const option = times_next_called % 8;
     const edge = clippingEdge();
     times_next_called--;
-    if (option % 2 === 0) {
+    if (option % 2 === 1) {
       // just chosen a point to render
+      clipEdge = edge;
       if (point === "point1" && first_points.length > 1) {
         const x = first_points[first_points.length - 1][0];
         const y = first_points[first_points.length - 1][1];
-        const mapObject = `${x},${y}`;
-        showPoints.set(mapObject, false);
-        first_points.pop();
+
+        if (edge === "LEFT" && x !== left) {
+        } else if (edge === "RIGHT" && x !== right) {
+        } else if (edge === "BOTTOM" && y !== down) {
+        } else if (edge === "TOP" && y !== up) {
+        } else {
+          const mapObject = `${x},${y}`;
+          console.log("point1", pointMap[mapObject]);
+          showPoints.set(mapObject, false);
+          first_points.pop();
+        }
       } else if (point === "point2" && second_points.length > 1) {
-        const x = second_points[second_points.length - 1][0];
-        const y = second_points[second_points.length - 1][1];
-        const mapObject = `${x},${y}`;
-        showPoints.set(mapObject, false);
-        second_points.pop();
+        clipEdge = edge;
+        if (second_points[second_points.length - 1].length === 2) {
+          const x = second_points[second_points.length - 1][0];
+          const y = second_points[second_points.length - 1][1];
+          if (edge === "LEFT" && x !== left) {
+          } else if (edge === "RIGHT" && x !== right) {
+          } else if (edge === "BOTTOM" && y !== down) {
+          } else if (edge === "TOP" && y !== up) {
+          } else {
+            const mapObject = `${x},${y}`;
+            console.log("point2", pointMap.get(mapObject));
+            showPoints.set(mapObject, false);
+            second_points.pop();
+          }
+        }
       }
-      clipEdge = edge;
     } else {
       // highlighted the edge
       clipEdge = "";
     }
+    console.log(times_next_called, point, edge, clipEdge);
+
     renderCanvas();
   }
 });
