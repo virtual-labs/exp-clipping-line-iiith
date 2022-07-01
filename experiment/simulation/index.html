@@ -12,12 +12,12 @@
 
   <body class="page has-text-centered">
     <div class="columns is-centered is-flex">
-      <div class="column has-text-centered">
-        <div class="v-collapsible-instruction-container">
-          <div class="v-collapsible">Instructions</div>
-          <div id="procedure-message "class="v-content">
+      <div class="mb-3 column has-text-centered">
+        <div class="mb-3 v-collapsible-instruction-container">
+          <div class="mb-3 v-collapsible">Instructions</div>
+          <div id="mb-3 procedure-message "class="v-content">
             <p style="font-size: 0.9rem">
-              <ol>
+              <ul>
                 <li>Use the Reset button to reset the simulation</li>
                 <li>Click on Next button to go to next iteration</li>
                 <li>Click on Previous button to go to previous iteration</li>
@@ -30,9 +30,9 @@
         </div>
       </div>
     </div>
-    <br />
+  
 
-    <div
+  <div
       class="columns is-centered is-variable is-1-mobile is-flex is-flex-wrap-wrap workspace left"
     >
       <div
@@ -42,21 +42,19 @@
         <div class="v-datalist-container">
           <div class="v-datalist-title is-size-8-mobile">Input</div>
           <div class="v-datalist-row">
-            <div style="float: left" class="is-size-7-mobile v-content">
-              Line Co-ordinates:
-            </div>
             <div>
-              <div class="v-datalist-row">
-                <p class="float:is-centered">Clipping Rectangle Coordinates</p>
-                <br />
-                <div style="display: is-flex">
+              <p class="float:is-centered">Clipping Rectangle Coordinates</p>
+             
+              <div class="mb-3 v-datalist-row">
+                
+                <div class="mb-3">
                   <div class="error-text" id="error-rect-left"></div>
                   <div class="error-text" id="error-rect-top"></div>
     
                   <label for="cnt-top-left-x">Left:</label>
                   <input
                     class="input is-small"
-                    style="width: 20%"
+                    style="width: 30%"
                     type="number"
                     id="cnt-top-left-x"
                     value="100"
@@ -65,22 +63,22 @@
                   <label for="cnt-top-left-y">Top:</label>
                   <input
                     class="input is-small"
-                    style="width: 20%"
+                    style="width: 30%"
                     type="number"
                     id="cnt-top-left-y"
                     value="100"
                     placeholder="Y"
                   />
                 </div>
-                <br />
-                <div style="display: is-flex">
+        
+                <div class="mb-3 is-flex">
                   <div class="error-text" id="error-rect-right"></div>
                   <div class="error-text" id="error-rect-bottom"></div>
     
                   <label for="cnt-bottom-right-x">Right:</label>
                   <input
                     class="input is-small"
-                    style="width: 20%"
+                    style="width: 30%"
                     type="number"
                     id="cnt-bottom-right-x"
                     value="600"
@@ -89,7 +87,7 @@
                   <label for="cnt-bottom-right-y"> Bottom:</label>
                   <input
                     class="input is-small"
-                    style="width: 20%"
+                    style="width: 30%"
                     type="number"
                     id="cnt-bottom-right-y"
                     value="300"
@@ -99,11 +97,13 @@
               </div>
             </div>
             <div>
-              <p class="is-size-7-mobile">Point 2:</p>
-              <div class="v-datalist-row" id="top-border">
-                <p style="float: is-centered">Line Co-ordinates:</p>
-                <br />
-                <div style="display: is-flex">
+           
+              <div class="mb-3 v-datalist-row" id="top-border">
+                <div class="mb-3">
+                  <p style="float: is-centered">Line Co-ordinates:</p>
+          
+                </div>
+                <div class="mb-3">
                   <div class="error-text" id="error-x1"></div>
                   <div class="error-text" id="error-y1"></div>
                   <label for="ln-top-left-x">X1:</label>
@@ -125,8 +125,8 @@
                     placeholder="Y"
                   />
                 </div>
-                <br />
-                <div style="display: is-flex">
+                
+                <div class="mb-3">
                   <div class="error-text" id="error-x2"></div>
                   <div class="error-text" id="error-y2"></div>
                   <label for="ln-bottom-right-x">X2:</label>
@@ -194,7 +194,7 @@
 
       </div>
 
-      <div class="column is-8-desktop is-11-tablet is-11-mobile exp">
+      <div id = "canvas-wrap"class="column is-8-desktop is-11-tablet is-11-mobile exp">
         <canvas
           class="v-canvas-container"
           id="canvas"
