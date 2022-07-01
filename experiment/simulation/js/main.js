@@ -16,18 +16,20 @@ const LEFT = 1; // 0001
 const RIGHT = 2; // 0010
 const BOTTOM = 4; // 0100
 const TOP = 8; // 1000
+const EMPTY = "";
 // global variables
-let times_next_called = 0;
+let timesNextCalled = 0;
 const canvas = document.getElementById("canvas");
 // marks the 4 borders of the rectangular grid
 let left, up, right, down;
 // mark the line coordinates
 let point1 = [],
   point2 = [];
-let first_points = [];
-let second_points = [];
-let MESSAGE = "";
-let clipEdge = "";
+let firstPoints = [];
+let rectangularPoints = [];
+let secondPoints = [];
+let MESSAGE = EMPTY;
+let clipEdge = EMPTY;
 let submit = false;
 const ctx = canvas.getContext("2d");
 // set the canvas properties
@@ -53,7 +55,6 @@ const leftBorder = document.getElementById("cnt-top-left-x");
 const topBorder = document.getElementById("cnt-top-left-y");
 const rightBorder = document.getElementById("cnt-bottom-right-x");
 const bottomBorder = document.getElementById("cnt-bottom-right-y");
-const EMPTY = "";
 const canvasTextAreaColor = "#f1f1f1";
 let pointsSoFar = 0;
 // a map that points characters to letters
@@ -75,6 +76,63 @@ function formValidate(text, errorClass, elementId, minVal, maxVal) {
     errorClass.style.display = "none";
   }
 }
+canvas.onmousemove = function (e) {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
+    for (let i = 0; i < firstPoints.length; i++) {
+      const mapObject = `${firstPoints[i][0]},${firstPoints[i][1]}`;
+      const divElem = document.getElementById(pointMap.get(mapObject));
+      if (
+        x >= parseFloat(firstPoints[i][0]) - 40 &&
+        x <= parseFloat(firstPoints[i][0]) + 40 &&
+        y <= parseFloat(firstPoints[i][1]) + 40 &&
+        y >= parseFloat(firstPoints[i][1]) - 40
+      ) {
+        canvas.style.cursor = "pointer";
+        divElem.style.display = "block";
+        return;
+      } else {
+        divElem.style.display = "none";
+      }
+    }
+    canvas.style.cursor = "default";
+    for (let i = 0; i < secondPoints.length; i++) {
+      const mapObject = `${secondPoints[i][0]},${secondPoints[i][1]}`;
+      const divElem = document.getElementById(pointMap.get(mapObject));
+      if (
+        x >= parseFloat(secondPoints[i][0]) - 40 &&
+        x <= parseFloat(secondPoints[i][0]) + 40 &&
+        y <= parseFloat(secondPoints[i][1]) + 40 &&
+        y >= parseFloat(secondPoints[i][1]) - 40
+      ) {
+        canvas.style.cursor = "pointer";
+        divElem.style.display = "block";
+        return;
+      } else {
+        divElem.style.display = "none";
+      }
+    }
+    for (let i = 0; i < rectangularPoints.length; i++) {
+      const mapObject = `${rectangularPoints[i][0]},${rectangularPoints[i][1]}`;
+      const divElem = document.getElementById(pointMap.get(mapObject));
+      if (
+        x >= parseFloat(rectangularPoints[i][0]) - 40 &&
+        x <= parseFloat(rectangularPoints[i][0]) + 40 &&
+        y <= parseFloat(rectangularPoints[i][1]) + 40 &&
+        y >= parseFloat(rectangularPoints[i][1]) - 40
+      ) {
+        canvas.style.cursor = "pointer";
+        divElem.style.display = "block";
+        return;
+      } else {
+        divElem.style.display = "none";
+      }
+    }
+  }
+};
 pointx1.onchange = () =>
   formValidate("X1", errorx1, "ln-top-left-x", MINX, MAXX);
 pointy1.onchange = () =>
@@ -118,7 +176,7 @@ function canvasMessage(message) {
   ctx.fillText(message, width / 2, textHeight + 20);
 }
 // function to display the coordinantes on the canvas
-function coordinatesText(x, y, color) {
+function coordinatesText(x, y) {
   ctx.font = "bold 20px serif";
   x = parseFloat(x);
   y = parseFloat(y);
@@ -168,6 +226,14 @@ function makePoint(x, y, dotColor, textColor) {
   if (!pointMap.has(mapObject)) {
     pointMap.set(mapObject, String.fromCharCode(65 + pointMap.size));
     showPoints.set(mapObject, true);
+    let div = document.createElement("div");
+    div.style.left = x + "px";
+    div.style.top = y + "px";
+    div.id = `${pointMap.get(mapObject)}`;
+    div.className = "point-div";
+    div.innerHTML = `<p>( ${x.toFixed(1)} , ${y.toFixed(1)})</p>`;
+
+    document.getElementById("canvas-wrap").appendChild(div);
   }
   coordinatesText(x, y, textColor);
 }
@@ -184,6 +250,10 @@ function drawGrid(leftColor, rightColor, bottomColor, topColor) {
   makePoint(right, down, "red", "red");
   makePoint(left, down, "red", "red");
   makePoint(right, up, "red", "red");
+  rectangularPoints.push([left, up]);
+  rectangularPoints.push([right, down]);
+  rectangularPoints.push([left, down]);
+  rectangularPoints.push([right, up]);
 }
 function calculateSlope() {
   if (point1[0] == point2[0]) {
@@ -252,9 +322,9 @@ function clipPoint(point, edge) {
 }
 function pointBeingClipped() {
   // whether point 1 is being clipped or the point 2
-  if (times_next_called >= 1 && times_next_called <= 8) {
+  if (timesNextCalled >= 1 && timesNextCalled <= 8) {
     return "point1";
-  } else if (times_next_called >= 9 && times_next_called <= 16) {
+  } else if (timesNextCalled >= 9 && timesNextCalled <= 16) {
     return "point2";
   } else {
     return null;
@@ -262,7 +332,7 @@ function pointBeingClipped() {
 }
 function clippingEdge() {
   // returns the current edge against which the point is being clipped
-  const option = times_next_called % 8;
+  const option = timesNextCalled % 8;
   if (option === 1 || option === 2) {
     return "LEFT";
   } else if (option === 3 || option === 4) {
@@ -273,21 +343,28 @@ function clippingEdge() {
     return "TOP";
   }
 }
-function highlightEdge(EDGE, width, color) {
+function highlightEdge(edge, width, color) {
   // higlight the edge of the boundary
-  if (EDGE === "LEFT") {
-    drawLine(left, 0, left, textHeight, width, color);
-  } else if (EDGE === "RIGHT") {
-    drawLine(right, 0, right, textHeight, width, color);
-  } else if (EDGE === "BOTTOM") {
-    drawLine(MINX - 100, down, MAXX + 50, down, width, color);
-  } else if (EDGE === "TOP") {
-    drawLine(0, up, width, up, width, color);
+  switch (edge) {
+    case "LEFT":
+      drawLine(left, 0, left, textHeight, width, color);
+      break;
+    case "BOTTOM":
+      drawLine(MINX - 100, down, MAXX + 100, down, width, color);
+      break;
+    case "RIGHT":
+      drawLine(right, 0, right, textHeight, width, color);
+      break;
+    case "TOP":
+      drawLine(0, up, width, up, width, color);
+      break;
+    default:
+      break;
   }
 }
 function chooseCanvasMessage() {
-  const p1 = first_points[first_points.length - 1],
-    p2 = second_points[second_points.length - 1];
+  const p1 = firstPoints[firstPoints.length - 1],
+    p2 = secondPoints[secondPoints.length - 1];
   const code1 = encodePoint(p1[0], p1[1]);
   const code2 = encodePoint(p2[0], p2[1]);
   if (code1 == 0 && code2 == 0) {
@@ -300,7 +377,7 @@ function chooseCanvasMessage() {
     return;
   } else {
     const point_being_clipped = pointBeingClipped();
-    const option = times_next_called % 8;
+    const option = timesNextCalled % 8;
     const edge = clippingEdge();
     if (option % 2 === 1) {
       MESSAGE = `Clipping ${point_being_clipped} against ${edge} edge`;
@@ -310,11 +387,11 @@ function chooseCanvasMessage() {
   }
 }
 function handleNext() {
-  if (times_next_called > 16) {
+  if (timesNextCalled > 16) {
     return;
   }
-  const p1 = first_points[first_points.length - 1],
-    p2 = second_points[second_points.length - 1];
+  const p1 = firstPoints[firstPoints.length - 1],
+    p2 = secondPoints[secondPoints.length - 1];
   const code1 = encodePoint(p1[0], p1[1]);
   const code2 = encodePoint(p2[0], p2[1]);
   if (code1 == 0 && code2 == 0) {
@@ -329,7 +406,7 @@ function handleNext() {
   } else {
     const point_being_clipped = pointBeingClipped();
     if (point_being_clipped === "point1") {
-      const option = times_next_called % 8;
+      const option = timesNextCalled % 8;
       // at each odd frame highlight the edge being clipped against
       const edge = clippingEdge();
       if (option % 2 === 1) {
@@ -338,7 +415,7 @@ function handleNext() {
       } else {
         const intersection_point = clipPoint(p1, edge);
         if (intersection_point.length !== 0) {
-          first_points.push(intersection_point);
+          firstPoints.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
         } else {
@@ -347,14 +424,14 @@ function handleNext() {
         clipEdge = "";
       }
     } else if (point_being_clipped === "point2") {
-      const option = times_next_called % 8;
+      const option = timesNextCalled % 8;
       const edge = clippingEdge();
       if (option % 2 === 1) {
         clipEdge = edge;
       } else {
         const intersection_point = clipPoint(p2, edge);
         if (intersection_point.length !== 0) {
-          second_points.push(intersection_point);
+          secondPoints.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
         } else {
@@ -391,8 +468,8 @@ function setParameters() {
   makePoint(x2, y2, "red", "red");
   point1 = [x1, y1];
   point2 = [x2, y2];
-  first_points.push(point1);
-  second_points.push(point2);
+  firstPoints.push(point1);
+  secondPoints.push(point2);
   // check if the parameters are valid or not
 }
 function renderObservations() {
@@ -429,16 +506,16 @@ function renderCanvas() {
 
   // draw the line
   drawLine(point1[0], point1[1], point2[0], point2[1], 2, "grey");
-  const activePoint1 = first_points[first_points.length - 1];
-  const activePoint2 = second_points[second_points.length - 1];
-  for (let i = 0; i < first_points.length - 1; i++) {
-    const point = first_points[i];
+  const activePoint1 = firstPoints[firstPoints.length - 1];
+  const activePoint2 = secondPoints[secondPoints.length - 1];
+  for (let i = 0; i < firstPoints.length - 1; i++) {
+    const point = firstPoints[i];
     if (point.length !== 0) {
       makePoint(point[0], point[1], "grey", "red");
     }
   }
-  for (let i = 0; i < second_points.length - 1; i++) {
-    const point = second_points[i];
+  for (let i = 0; i < secondPoints.length - 1; i++) {
+    const point = secondPoints[i];
     if (point.length !== 0) {
       makePoint(point[0], point[1], "grey", "grey");
     }
@@ -462,10 +539,10 @@ function renderCanvas() {
 submitButton.addEventListener("click", function () {
   // set the parameters
   pointMap = new Map();
-  times_next_called = 0;
+  timesNextCalled = 0;
 
-  first_points = [];
-  second_points = [];
+  firstPoints = [];
+  secondPoints = [];
   MESSAGE = "";
   clipEdge = "";
   point1 = [];
@@ -489,9 +566,9 @@ resetButton.addEventListener("click", function () {
   ctx.fillStyle = "black";
   clearTable();
   pointsSoFar = 0;
-  times_next_called = 0;
-  first_points = [];
-  second_points = [];
+  timesNextCalled = 0;
+  firstPoints = [];
+  secondPoints = [];
   MESSAGE = "";
   clipEdge = "";
   point1 = [];
@@ -501,28 +578,28 @@ resetButton.addEventListener("click", function () {
   pointMap = new Map();
 });
 nextButton.addEventListener("click", function () {
-  if (submit && times_next_called < 16) {
-    if (times_next_called < 0) {
-      times_next_called = 0;
+  if (submit && timesNextCalled < 16) {
+    if (timesNextCalled < 0) {
+      timesNextCalled = 0;
     }
-    times_next_called++;
+    timesNextCalled++;
 
     handleNext();
     renderCanvas();
   }
 });
 previousButton.addEventListener("click", function () {
-  if (times_next_called >= 0) {
+  if (timesNextCalled >= 0) {
     const point = pointBeingClipped();
-    const option = times_next_called % 8;
+    const option = timesNextCalled % 8;
     const edge = clippingEdge();
-    times_next_called--;
+    timesNextCalled--;
     if (option % 2 === 1) {
       // just chosen a point to render
       clipEdge = edge;
-      if (point === "point1" && first_points.length > 1) {
-        const x = first_points[first_points.length - 1][0];
-        const y = first_points[first_points.length - 1][1];
+      if (point === "point1" && firstPoints.length > 1) {
+        const x = firstPoints[firstPoints.length - 1][0];
+        const y = firstPoints[firstPoints.length - 1][1];
 
         if (edge === "LEFT" && x !== left) {
         } else if (edge === "RIGHT" && x !== right) {
@@ -531,12 +608,12 @@ previousButton.addEventListener("click", function () {
         } else {
           const mapObject = `${x},${y}`;
           showPoints.set(mapObject, false);
-          first_points.pop();
+          firstPoints.pop();
         }
-      } else if (point === "point2" && second_points.length > 1) {
-        if (second_points[second_points.length - 1].length === 2) {
-          const x = second_points[second_points.length - 1][0];
-          const y = second_points[second_points.length - 1][1];
+      } else if (point === "point2" && secondPoints.length > 1) {
+        if (secondPoints[secondPoints.length - 1].length === 2) {
+          const x = secondPoints[secondPoints.length - 1][0];
+          const y = secondPoints[secondPoints.length - 1][1];
           if (edge === "LEFT" && x !== left) {
           } else if (edge === "RIGHT" && x !== right) {
           } else if (edge === "BOTTOM" && y !== down) {
@@ -544,7 +621,7 @@ previousButton.addEventListener("click", function () {
           } else {
             const mapObject = `${x},${y}`;
             showPoints.set(mapObject, false);
-            second_points.pop();
+            secondPoints.pop();
           }
         }
       }
@@ -552,7 +629,7 @@ previousButton.addEventListener("click", function () {
       // highlighted the edge
       clipEdge = "";
     }
-    console.log(times_next_called, point, edge, clipEdge);
+    console.log(timesNextCalled, point, edge, clipEdge);
 
     renderCanvas();
   }
