@@ -78,57 +78,59 @@ function formValidate(text, errorClass, elementId, minVal, maxVal) {
 }
 canvas.onmousemove = function (e) {
   e.preventDefault();
-  const r = canvas.getBoundingClientRect();
-  const x = e.clientX - r.left;
-  const y = e.clientY - r.top;
-  if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-    for (let i = 0; i < firstPoints.length; i++) {
-      const mapObject = `${firstPoints[i][0]},${firstPoints[i][1]}`;
-      const divElem = document.getElementById(pointMap.get(mapObject));
-      if (
-        x >= parseFloat(firstPoints[i][0]) - 40 &&
-        x <= parseFloat(firstPoints[i][0]) + 40 &&
-        y <= parseFloat(firstPoints[i][1]) + 40 &&
-        y >= parseFloat(firstPoints[i][1]) - 40
-      ) {
-        canvas.style.cursor = "pointer";
-        divElem.style.display = "block";
-        return;
-      } else {
-        divElem.style.display = "none";
+  if (submit) {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
+      for (let i = 0; i < firstPoints.length; i++) {
+        const mapObject = `${firstPoints[i][0]},${firstPoints[i][1]}`;
+        const divElem = document.getElementById(pointMap.get(mapObject));
+        if (
+          x >= parseFloat(firstPoints[i][0]) - 40 &&
+          x <= parseFloat(firstPoints[i][0]) + 40 &&
+          y <= parseFloat(firstPoints[i][1]) + 40 &&
+          y >= parseFloat(firstPoints[i][1]) - 40
+        ) {
+          canvas.style.cursor = "pointer";
+          divElem.style.display = "block";
+          return;
+        } else {
+          divElem.style.display = "none";
+        }
       }
-    }
-    canvas.style.cursor = "default";
-    for (let i = 0; i < secondPoints.length; i++) {
-      const mapObject = `${secondPoints[i][0]},${secondPoints[i][1]}`;
-      const divElem = document.getElementById(pointMap.get(mapObject));
-      if (
-        x >= parseFloat(secondPoints[i][0]) - 40 &&
-        x <= parseFloat(secondPoints[i][0]) + 40 &&
-        y <= parseFloat(secondPoints[i][1]) + 40 &&
-        y >= parseFloat(secondPoints[i][1]) - 40
-      ) {
-        canvas.style.cursor = "pointer";
-        divElem.style.display = "block";
-        return;
-      } else {
-        divElem.style.display = "none";
+      canvas.style.cursor = "default";
+      for (let i = 0; i < secondPoints.length; i++) {
+        const mapObject = `${secondPoints[i][0]},${secondPoints[i][1]}`;
+        const divElem = document.getElementById(pointMap.get(mapObject));
+        if (
+          x >= parseFloat(secondPoints[i][0]) - 40 &&
+          x <= parseFloat(secondPoints[i][0]) + 40 &&
+          y <= parseFloat(secondPoints[i][1]) + 40 &&
+          y >= parseFloat(secondPoints[i][1]) - 40
+        ) {
+          canvas.style.cursor = "pointer";
+          divElem.style.display = "block";
+          return;
+        } else {
+          divElem.style.display = "none";
+        }
       }
-    }
-    for (let i = 0; i < rectangularPoints.length; i++) {
-      const mapObject = `${rectangularPoints[i][0]},${rectangularPoints[i][1]}`;
-      const divElem = document.getElementById(pointMap.get(mapObject));
-      if (
-        x >= parseFloat(rectangularPoints[i][0]) - 40 &&
-        x <= parseFloat(rectangularPoints[i][0]) + 40 &&
-        y <= parseFloat(rectangularPoints[i][1]) + 40 &&
-        y >= parseFloat(rectangularPoints[i][1]) - 40
-      ) {
-        canvas.style.cursor = "pointer";
-        divElem.style.display = "block";
-        return;
-      } else {
-        divElem.style.display = "none";
+      for (let i = 0; i < rectangularPoints.length; i++) {
+        const mapObject = `${rectangularPoints[i][0]},${rectangularPoints[i][1]}`;
+        const divElem = document.getElementById(pointMap.get(mapObject));
+        if (
+          x >= parseFloat(rectangularPoints[i][0]) - 40 &&
+          x <= parseFloat(rectangularPoints[i][0]) + 40 &&
+          y <= parseFloat(rectangularPoints[i][1]) + 40 &&
+          y >= parseFloat(rectangularPoints[i][1]) - 40
+        ) {
+          canvas.style.cursor = "pointer";
+          divElem.style.display = "block";
+          return;
+        } else {
+          divElem.style.display = "none";
+        }
       }
     }
   }
@@ -167,13 +169,13 @@ function encodePoint(x, y) {
 }
 // helper function for displaying meesage on the canvas
 function canvasMessage(message) {
-  ctx.font = "20px serif";
+  ctx.font = "30px serif";
   ctx.clearRect(0, textHeight, canvas.width, height - textHeight);
   ctx.fillStyle = canvasTextAreaColor;
   ctx.fillRect(0, textHeight, canvas.width, canvas.height);
   ctx.fillStyle = "black";
   ctx.rect(0, textHeight, canvas.width, height - textHeight);
-  ctx.fillText(message, width / 2, textHeight + 20);
+  ctx.fillText(message, width / 2, textHeight + 25);
 }
 // function to display the coordinantes on the canvas
 function coordinatesText(x, y) {
@@ -540,7 +542,8 @@ submitButton.addEventListener("click", function () {
   // set the parameters
   pointMap = new Map();
   timesNextCalled = 0;
-
+  showPoints = new Map();
+  rectangularPoints = [];
   firstPoints = [];
   secondPoints = [];
   MESSAGE = "";
@@ -549,6 +552,7 @@ submitButton.addEventListener("click", function () {
   pointsSoFar = 0;
   point2 = [];
   submit = false;
+  const canvasDiv = document.getElementById("canvas-wrap");
 
   // draw the grid
   if (valid === true) {
