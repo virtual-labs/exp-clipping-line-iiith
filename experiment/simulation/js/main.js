@@ -28,7 +28,7 @@ let point1 = [],
 let firstPoints = [];
 let rectangularPoints = [];
 let secondPoints = [];
-let MESSAGE = EMPTY;
+let message = EMPTY;
 let clipEdge = EMPTY;
 let submit = false;
 const ctx = canvas.getContext("2d");
@@ -198,10 +198,7 @@ function clearTable() {
 }
 function fillTable() {}
 // function draw line between the given two points
-function drawLine(x1, y1, x2, y2, width, color) {
-  if (color === undefined || color === "") {
-    color = gridColor;
-  }
+function drawLine(x1, y1, x2, y2, width, color = gridColor) {
   ctx.beginPath();
   x1 = parseFloat(x1) + 0.5;
   y1 = parseFloat(y1) + 0.5;
@@ -370,11 +367,11 @@ function chooseCanvasMessage() {
   const code1 = encodePoint(p1[0], p1[1]);
   const code2 = encodePoint(p2[0], p2[1]);
   if (code1 == 0 && code2 == 0) {
-    MESSAGE = "Line is Clipped";
+    message = "Line is Clipped";
     return;
   } else if (code1 & code2) {
     // both lie in the same region , no intersection with the rectangular grid
-    MESSAGE =
+    message =
       "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
     return;
   } else {
@@ -382,9 +379,9 @@ function chooseCanvasMessage() {
     const option = timesNextCalled % 8;
     const edge = clippingEdge();
     if (option % 2 === 1) {
-      MESSAGE = `Clipping ${point_being_clipped} against ${edge} edge`;
+      message = `Clipping ${point_being_clipped} against ${edge} edge`;
     } else {
-      MESSAGE = "";
+      message = "";
     }
   }
 }
@@ -397,12 +394,12 @@ function handleNext() {
   const code1 = encodePoint(p1[0], p1[1]);
   const code2 = encodePoint(p2[0], p2[1]);
   if (code1 == 0 && code2 == 0) {
-    MESSAGE = "Line is Clipped";
+    message = "Line is Clipped";
     return;
   } else if (code1 & code2) {
     // both lie in the same region , no intersection with the rectangular grid
 
-    MESSAGE =
+    message =
       "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
     return;
   } else {
@@ -535,7 +532,7 @@ function renderCanvas() {
   ctx.fillStyle = "black";
   renderObservations();
   chooseCanvasMessage();
-  canvasMessage(MESSAGE);
+  canvasMessage(message);
 }
 // handle the submit button
 submitButton.addEventListener("click", function () {
@@ -546,13 +543,12 @@ submitButton.addEventListener("click", function () {
   rectangularPoints = [];
   firstPoints = [];
   secondPoints = [];
-  MESSAGE = "";
-  clipEdge = "";
+  message = EMPTY;
+  clipEdge = EMPTY;
   point1 = [];
   pointsSoFar = 0;
   point2 = [];
   submit = false;
-  const canvasDiv = document.getElementById("canvas-wrap");
 
   // draw the grid
   if (valid === true) {
@@ -573,8 +569,8 @@ resetButton.addEventListener("click", function () {
   timesNextCalled = 0;
   firstPoints = [];
   secondPoints = [];
-  MESSAGE = "";
-  clipEdge = "";
+  message = EMPTY;
+  clipEdge = EMPTY;
   point1 = [];
   point2 = [];
   submit = false;
