@@ -1,3 +1,4 @@
+
 "use strict";
 // declaring the global constants
 const MAXX = 1195;
