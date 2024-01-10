@@ -1,0 +1,19 @@
+
+/home/danny-vader/Desktop/virtual-labs/2023-winter-intern/exp-clipping-line-iiith/experiment/simulation/js/main.js
+   60:5   warning  'pointsSoFar' is assigned a value but never used  no-unused-vars
+  200:10  warning  'fillTable' is defined but never used             no-unused-vars
+  354:10  warning  'highlightEdge' is defined but never used         no-unused-vars
+  429:16  warning  Empty block statement                             no-empty
+  445:16  warning  Empty block statement                             no-empty
+  562:9   warning  'canvasDiv' is assigned a value but never used    no-unused-vars
+  616:44  warning  Empty block statement                             no-empty
+  617:53  warning  Empty block statement                             no-empty
+  618:53  warning  Empty block statement                             no-empty
+  619:48  warning  Empty block statement                             no-empty
+  629:46  warning  Empty block statement                             no-empty
+  630:55  warning  Empty block statement                             no-empty
+  631:55  warning  Empty block statement                             no-empty
+  632:50  warning  Empty block statement                             no-empty
+
+✖ 14 problems (0 errors, 14 warnings)
+
