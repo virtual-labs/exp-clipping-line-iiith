@@ -1,5 +1,0 @@
-In computer graphics, when rendering a 2D image on a display screen, it's common for the display area to occupy only a portion of the entire image space. To optimize rendering and reduce computational overhead, the unnecessary portions of the image outside the display area are eliminated—a process known as clipping. The region within the display area is often referred to as the clipped window.
-
-Line clipping specifically deals with the removal of parts of lines that extend beyond the boundaries of the clipped window. Several algorithms exist for line clipping, with notable examples including the Cohen-Sutherland, Liang-Barsky, and Nicholl-Lee-Nicholl algorithms.
-
-This experiment focuses on the Cohen-Sutherland Line Clipping algorithm, exploring its principles and application in efficiently removing extraneous line segments outside the clipped window.

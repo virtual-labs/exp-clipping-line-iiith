@@ -1,1 +1,1 @@
-## Clipping : Line
+## Clipping: Line
