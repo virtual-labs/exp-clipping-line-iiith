@@ -1,0 +1,1 @@
+Gain a comprehensive understanding of the fundamental steps involved in Line Clipping Algorithms, focusing on the geometric process of clipping a line to display only the visible portion within the user's view. This experiment provides a detailed walkthrough of the Cohen-Sutherland Algorithm, illustrating its sequential steps as a practical example.
