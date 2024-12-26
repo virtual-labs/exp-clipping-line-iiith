@@ -27,6 +27,7 @@
       "unit-type": "task",
       "content-type": "assesment"
     },
+
     {
       "target": "procedure.html",
       "source": "procedure.md",
@@ -57,4 +58,3 @@
     }
   ]
 }
-
