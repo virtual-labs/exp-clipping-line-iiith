@@ -24,10 +24,11 @@
           <li class="instr-font">
             <strong style="font-size: 19px;">📏 Clipping Rectangle Coordinates</strong>:
             <ul style="list-style-type: disc; padding-left: 20px;">
-              <li><strong>Left</strong>: Horizontal starting position of the clipping area.</li>
-              <li><strong>Right</strong>: Horizontal ending position of the clipping area.</li>
-              <li><strong>Top</strong>: Vertical starting position of the clipping area.</li>
-              <li><strong>Bottom</strong>: Vertical ending position of the clipping area.</li>
+              <li><strong>Top Left</strong>: The coordinates of the upper-left corner of the clipping area.
+              </li>
+              <li><strong>Bottom Right</strong>: The coordinates of the lower-right corner of the clipping
+                area.</li>
+            
             </ul>
           </li>
           <li class="instr-font">
@@ -96,25 +97,24 @@
                 <div class="error-text" id="error-rect-left"></div>
                 <div class="error-text" id="error-rect-top"></div>
 
-                <label for="cnt-top-left-x">Left:</label>
-                <input class="input is-small" style="width: 25%" type="number" id="cnt-top-left-x" value="100"
-                  placeholder="X" />
-                <label for="cnt-top-left-y">Top:</label>
-                <input class="input is-small" style="width: 25%" type="number" id="cnt-top-left-y" value="100"
-                  placeholder="Y" />
+                <label for="cnt-top-left-x">Top-Left</label><br>
+                <span>X:</span><input class="input is-small" style="width: 30%" type="number" id="cnt-top-left-x" value="100"
+                  placeholder="X" min="60" max="1195"/>
+                <!-- <label for="cnt-top-left-y">Top:</label> -->
+                <span>Y:</span><input class="input is-small" style="width: 30%" type="number" id="cnt-top-left-y" value="100"
+                  placeholder="Y" min="20" max="490"/>
               </div>
+            <div class="mb-3 columns" style="display: flex;">
+              <div class="error-text" id="error-rect-right"></div>
+              <div class="error-text" id="error-rect-bottom"></div>
+            </div>
+            <div style="clear: both;"></div> <!-- Clear floats -->
+            <label for="cnt-bottom-right-x">Bottom-Right</label><br>
+            <div class="mb-3 columns" style="display: inline-block; align-content: center;">
+              <span>X:</span><input class="input is-small" style="width: 30%;" type="number" id="cnt-bottom-right-x" value="600" placeholder="X" min="60" max="1195" />
+              <span>Y:</span><input class="input is-small" style="width: 30%;" type="number" id="cnt-bottom-right-y" value="300" placeholder="Y" min="20" max="490"/>
+            </div>
 
-              <div class="mb-3 columns" style="display: flex;">
-                <div class="error-text" id="error-rect-right"></div>
-                <div class="error-text" id="error-rect-bottom"></div>
-
-                <label for="cnt-bottom-right-x">Right:</label>
-                <input class="input is-small" style="width: 25%" type="number" id="cnt-bottom-right-x" value="600"
-                  placeholder="X" />
-                <label for="cnt-bottom-right-y"> Bottom:</label>
-                <input class="input is-small" style="width: 25%" type="number" id="cnt-bottom-right-y" value="300"
-                  placeholder="Y" />
-              </div>
 
             </div>
           </div>
@@ -164,9 +164,10 @@
             <button style="margin: 1%" class="v-button previous-btn is-responsive" id="prev_button">
               Prev
             </button>
-            <button style="margin: 1%" class="v-button reset-btn is-responsive" id="reset_button">
-              Reset
-            </button>
+          <button style="margin: 1%" class="v-button reset-btn is-responsive" id="reset_button" onclick="location.reload()">
+            Reset
+          </button>
+
           </div>
         </div>
       </div>
