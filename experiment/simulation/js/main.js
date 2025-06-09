@@ -1,4 +1,3 @@
-
 "use strict";
 // declaring the global constants
 const MAXX = 1195;
@@ -77,6 +76,44 @@ function formValidate(text, errorClass, elementId, minVal, maxVal) {
     errorClass.style.display = "none";
   }
 }
+
+const toggleInstructions = document.getElementById("toggle-instructions");
+const procedureMessage = document.getElementById("procedure-message");
+
+// Function to show the instructions overlay
+const showInstructions = () => {
+  procedureMessage.style.display = "block";
+};
+
+// Function to hide the instructions overlay
+const hideInstructions = (event) => {
+  // Close if click is outside the overlay or if it's the toggle button again
+  if (
+    !procedureMessage.contains(event.target) &&
+    event.target !== toggleInstructions
+  ) {
+    procedureMessage.style.display = "none";
+  }
+};
+
+// Attach event listeners
+toggleInstructions.addEventListener("click", (event) => {
+  // Toggle the visibility of the overlay
+  if (procedureMessage.style.display === "block") {
+    procedureMessage.style.display = "none";
+  } else {
+    showInstructions();
+  }
+  event.stopPropagation(); // Prevent immediate closure after clicking the button
+});
+
+document.addEventListener("click", hideInstructions);
+
+// Prevent closing the overlay when clicking inside it
+procedureMessage.addEventListener("click", (event) => {
+  event.stopPropagation(); // Prevent the click inside from closing the overlay
+});
+
 canvas.onmousemove = function (e) {
   e.preventDefault();
   if (submit) {
@@ -499,7 +536,6 @@ function renderCanvas() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, textHeight);
 
-  // again draw the grid
   if (clipEdge == "") {
     drawGrid();
   } else if (clipEdge === "LEFT") {
@@ -646,3 +682,10 @@ previousButton.addEventListener("click", function () {
     renderCanvas();
   }
 });
+
+function init() {
+  submitButton.click();
+  renderCanvas();
+}
+
+init();

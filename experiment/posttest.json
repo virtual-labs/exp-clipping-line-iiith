@@ -1,18 +1,53 @@
 [
-{"question":"This is a Sample Question 1?",
-"answers":{
-            "a":"answer1",
-            "b":"answer2",
-            "c":"answer3",
-            "d":"answer4"
-          },
-"correctAnswer":"a"},
-{"question":"This is a Sample Question 2?",
-"answers":{
-            "a":"answer1",
-            "b":"answer2",
-            "c":"answer3",
-            "d":"answer4"
-          },
-"correctAnswer":"c"} 
+  {
+    "question": "1. Which term is commonly used for the region within the display area in clipping?",
+    "answers": {
+      "a": "Render space",
+      "b": "Visible area",
+      "c": "Clipped window",
+      "d": "Display zone"
+    },
+    "correctAnswer": "c",
+    "explanations": {
+      "a": "Render space is not a common term for the display area.",
+      "b": "While correct, a more specific term is commonly used in computer graphics.",
+      "c": "Correct! The region within the display area is often referred to as the clipped window.",
+      "d": "Display zone is not the commonly used term in this context."
+    },
+    "difficulty": "beginner"
+  },
+  {
+    "question": "2. Which of the following is NOT a common algorithm for line clipping?",
+    "answers": {
+      "a": "Cohen-Sutherland",
+      "b": "Liang-Barsky",
+      "c": "Nicholl-Lee-Nicholl",
+      "d": "Bubble Sort"
+    },
+    "correctAnswer": "d",
+    "explanations": {
+      "a": "Cohen-Sutherland is a line clipping algorithm.",
+      "b": "Liang-Barsky is a line clipping algorithm.",
+      "c": "Nicholl-Lee-Nicholl is a line clipping algorithm.",
+      "d": "Correct! Bubble Sort is a sorting algorithm, not a line clipping algorithm."
+    },
+    "difficulty": "intermediate"
+  },
+  {
+    "question": "3. Which geometric concept is central to line clipping algorithms?",
+    "answers": {
+      "a": "Translation",
+      "b": "Rotation",
+      "c": "Projection",
+      "d": "Intersection"
+    },
+    "correctAnswer": "d",
+    "explanations": {
+      "a": "Translation involves shifting, not clipping.",
+      "b": "Rotation deals with turning or spinning, not clipping.",
+      "c": "Projection involves mapping 3D to 2D, not clipping.",
+      "d": "Correct! Line clipping algorithms often rely on the concept of intersection for determining visibility."
+    },
+    "difficulty": "advanced"
+  }
 ]
