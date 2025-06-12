@@ -1,0 +1,11 @@
+{
+  _: [],
+  f: [
+    '/home/runner/work/exp-clipping-line-iiith/exp-clipping-line-iiith/experiment-descriptor.json'
+  ],
+  files: [
+    '/home/runner/work/exp-clipping-line-iiith/exp-clipping-line-iiith/experiment-descriptor.json'
+  ],
+  '$0': 'validate'
+}
+Validated true

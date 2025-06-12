@@ -1,0 +1,217 @@
+.page {
+  overflow: hidden;
+  margin: 1rem;
+}
+
+.text {
+  text-align: center;
+}
+
+.columns {
+  margin: 0.1vw;
+}
+
+.table-body {
+  overflow: auto;
+  height: 100%;
+}
+
+.error-text {
+  color: red;
+  display: none;
+  font-size: 12px;
+}
+
+#canvas-wrap {
+  position: relative;
+}
+
+.point-div {
+  position: absolute;
+  display: none;
+  background-color: #f1f1f1;
+  text-decoration: bold;
+  z-index: 2;
+  font-size: 20px;
+  color: red;
+  padding: 4px;
+  margin: 2px;
+}
+
+.error {
+  border: 2px solid red;
+}
+
+.v-canvas-container {
+  width: 100%;
+  height: 100%;
+  color: black;
+}
+
+.v-datalist-container {
+  height: 100%;
+  margin: 0;
+}
+
+.v-slider-full {
+  width: 80%;
+}
+
+.input-form {
+  display: none;
+  color: black;
+}
+
+.button {
+  margin: 1rem;
+}
+
+.add {
+  font-size: 0.9rem;
+}
+
+.left {
+  order: 1;
+}
+
+.right {
+  order: 3;
+}
+
+.exp {
+  order: 2;
+}
+
+.button-div {
+  order: 3;
+}
+
+#top-border {
+  border-top: 1px solid black;
+}
+
+.v-datalist-title {
+  border-bottom: 0;
+}
+
+.v-collapsible-instruction-container {
+  width: 60%;
+  margin: auto;
+  border-radius: 0.25rem;
+}
+
+.v-collapsible {
+  width: 98%;
+  margin: auto;
+}
+
+.v-collapsible::after {
+  size: 1rem;
+}
+
+.v-checkbox {
+  margin-bottom: 0.1rem;
+}
+
+@media screen and (max-width: 768px) {
+  /* Adjust columns for mobile screens */
+  .workspace {
+    width: 98%;  /* Match instructions div width */
+    margin: 0 auto;
+    padding: 0 1%;  /* Add small padding on sides */
+  }
+
+  .workspace .column {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+  }
+
+  /* Specific adjustments for left and right columns */
+  #left.column.is-10-mobile {
+    width: 100%;  /* Full width within workspace */
+    margin: 0;  /* Remove auto margins */
+  }
+
+  .right.column.is-10-mobile {
+    width: 100%;  /* Full width within workspace */
+    margin: 0;  /* Remove auto margins */
+  }
+
+  /* Ensure canvas column maintains its width */
+  #canvas-wrap.column.is-12-mobile {
+    width: 100%;  /* Full width within workspace */
+    padding: 0;  /* Remove padding to maximize canvas space */
+  }
+
+  /* Specific adjustments */
+  #left {
+    order: 1;
+  }
+
+  .right {
+    order: 2;
+  }
+
+  .exp {
+    order: 3;
+  }
+}
+
+.v-button {
+  background-color: #04aa6d;
+  border-radius: 0.5rem;
+  font-size: small;
+}
+
+.next-btn {
+  background-color: #3298dc;
+  border-radius: 0.5rem;
+}
+
+.previous-btn {
+  background-color: #48c774;
+  border-radius: 0.5rem;
+}
+
+.reset-btn {
+  background-color: #f14668;
+  border-radius: 0.5rem;
+}
+
+#procedure-message {
+  display: none;
+  position: fixed;
+  max-width: 100vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #f0f4f8, #d6e1e7);
+  z-index: 1000;
+  padding: 35px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  text-align: left;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: fadeIn 0.5s ease-out;
+  border: 2px solid #3498db;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#procedure-message:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.instr-font {
+  font-size: 1rem;
+  color: #000;
+}

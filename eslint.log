@@ -1,0 +1,9 @@
+
+/home/runner/work/exp-clipping-line-iiith/exp-clipping-line-iiith/experiment/simulation/js/main.js
+   59:5   warning  'pointsSoFar' is assigned a value but never used  no-unused-vars
+  253:10  warning  'fillTable' is defined but never used             no-unused-vars
+  407:10  warning  'highlightEdge' is defined but never used         no-unused-vars
+  661:9   warning  'canvasDiv' is assigned a value but never used    no-unused-vars
+
+✖ 4 problems (0 errors, 4 warnings)
+

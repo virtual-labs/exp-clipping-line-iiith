@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/virtual-labs/virtual-style@0.0.8-b/css/style.min.css" />
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+
+<body class="page has-text-centered">
+  <div class="columns is-centered is-flex column">
+    <div class="mb-3 column has-text-centered">
+      <div class="v-collapsible-instruction-container">
+        <div class="v-collapsible" id="toggle-instructions"
+          style="cursor: pointer; background: #f1f1f1; padding: 10px; border-radius: 5px;">
+          <strong>Instructions</strong>
+        </div>
+      </div>
+
+      <!-- Fullscreen Instructions Modal -->
+      <div id="procedure-message" class="v-content">
+        <ol>
+          <li class="instr-font">
+            <strong style="font-size: 19px;">📏 Clipping Rectangle Coordinates</strong>:
+            <ul style="list-style-type: disc; padding-left: 20px;">
+              <li><strong>Top Left</strong>: The coordinates of the upper-left corner of the clipping area.
+              </li>
+              <li><strong>Bottom Right</strong>: The coordinates of the lower-right corner of the clipping
+                area.</li>
+
+            </ul>
+          </li>
+          <li class="instr-font">
+            <strong style="font-size: 19px;">🖋️ Line Coordinates</strong>:
+            <ul style="list-style-type: disc; padding-left: 20px;">
+              <li><strong>X1</strong>: Starting horizontal position of the line.</li>
+              <li><strong>Y1</strong>: Starting vertical position of the line.</li>
+              <li><strong>X2</strong>: Ending horizontal position of the line.</li>
+              <li><strong>Y2</strong>: Ending vertical position of the line.</li>
+            </ul>
+          </li>
+
+          <li class="instr-font">
+            <strong style="font-size: 19px;">🚀 Getting Started</strong>:
+            <p>To begin, set the clipping window and line coordinates, then press <strong
+                style="color: #04aa6d;;">Submit</strong>.
+              Use the controls below to navigate through the simulation:</p>
+          </li>
+          <ul style="list-style-type: disc; padding-left: 20px;">
+            <li class="instr-font">
+              <strong style="font-size: 19px;">🔼 <span style="color: #3298dc;">Next</span>:</strong> Move forward to
+              the next step
+              or iteration.
+            </li>
+            <li class="instr-font">
+              <strong style="font-size: 19px;">🔽 <span style="color: #48c774;">Prev</span>:</strong> Move back to the
+              previous step
+              or iteration.
+            </li>
+            <li class="instr-font">
+              <strong style="font-size: 19px;">🔄 <span style="color: #f14668;">Reset</span>:</strong> Reset the
+              simulation to its
+              initial state.
+            </li>
+
+          </ul>
+          <li class="instr-font">
+            <strong style="font-size: 19px;">🔍 Observations</strong>:
+            <ul style="list-style-type: disc; padding-left: 20px;">
+              <li>Explore and interact with the current positions of shapes and lines using these coordinates.</li>
+            </ul>
+          </li>
+          <div style="background-color: #f0f0f0; padding: 5px; margin: 10px 0;">
+            <p style="font-style: italic; text-align: center; margin: 0;">
+              Note: This experiment simulation is optimized for desktop screens. While basic functionality is
+              available on
+              mobile devices, for the best experience, use a desktop or PC monitor.
+            </p>
+          </div>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="columns is-centered is-variable is-1-mobile  is-flex-wrap-wrap workspace left">
+    <div id="left" class="column has-text-centered is-2-desktop is-5-tablet is-10-mobile apparatus">
+      <div class="v-datalist-container">
+        <div class="v-datalist-title is-size-8-mobile">Input</div>
+        <div class="v-datalist-row">
+          <div>
+            <p class="float:is-centered">Clipping Rectangle Coordinates</p>
+
+            <div class="mb-3 v-datalist-row">
+
+              <div class="mb-3">
+                <div class="error-text" id="error-rect-left"></div>
+                <div class="error-text" id="error-rect-top"></div>
+
+                <label for="cnt-top-left-x">Top-Left</label><br>
+                <span>X:</span><input class="input is-small" style="width: 30%" type="number" id="cnt-top-left-x"
+                  value="100" placeholder="X" min="60" max="1195" />
+                <!-- <label for="cnt-top-left-y">Top:</label> -->
+                <span>Y:</span><input class="input is-small" style="width: 30%" type="number" id="cnt-top-left-y"
+                  value="100" placeholder="Y" min="20" max="490" />
+              </div>
+              <div class="mb-3 columns" style="display: flex;">
+                <div class="error-text" id="error-rect-right"></div>
+                <div class="error-text" id="error-rect-bottom"></div>
+              </div>
+              <div style="clear: both;"></div> <!-- Clear floats -->
+              <label for="cnt-bottom-right-x">Bottom-Right</label><br>
+              <span>X:</span><input class="input is-small" style="width: 30%;" type="number" id="cnt-bottom-right-x"
+                value="600" placeholder="X" min="60" max="1195" />
+              <span>Y:</span><input class="input is-small" style="width: 30%;" type="number" id="cnt-bottom-right-y"
+                value="300" placeholder="Y" min="20" max="490" />
+
+
+            </div>
+          </div>
+          <div>
+
+            <div class="mb-3 v-datalist-row" id="top-border">
+              <div class="mb-3">
+                <p style="float: is-centered">Line Co-ordinates:</p>
+
+              </div>
+              <div class="mb-3">
+                <div class="error-text" id="error-x1"></div>
+                <div class="error-text" id="error-y1"></div>
+                <label for="ln-top-left-x">X1:</label>
+                <input class="input is-small" style="width: 30%" type="number" id="ln-top-left-x" value="50"
+                  placeholder="X" />
+                <label for="ln-top-left-y">Y1:</label>
+                <input class="input is-small" style="width: 30%" type="number" id="ln-top-left-y" value="450"
+                  placeholder="Y" />
+              </div>
+
+      
+
+              <div class="mb-3">
+                <div class="error-text" id="error-x2"></div>
+                <div class="error-text" id="error-y2"></div>
+                <label for="ln-bottom-right-x">X2:</label>
+                <input class="input is-small" style="width: 30%" type="number" id="ln-bottom-right-x" value="1020"
+                  placeholder="X" />
+                <label for="ln-bottom-right-y">Y2:</label>
+                <input class="input is-small" style="width: 30%" type="number" id="ln-bottom-right-y" value="50"
+                  placeholder="Y" />
+              </div>
+            </div>
+          </div>
+
+          <button class="v-button is-small is-primary is-responsive" style="margin: 0.5rem" id="submit">
+            Submit
+          </button>
+        </div>
+        <div class="v-datalist-row" id="top-border">
+          <div class="v-datalist-title is-size-8-mobile">
+            Iteration Controls
+          </div>
+          <div class="columns is-centered  is-flex-wrap-wrap button-div" style="margin: auto; width: auto">
+            <button style="margin: 1%" class="v-button next-btn is-responsive" id="next_button">
+              Next
+            </button>
+            <button style="margin: 1%" class="v-button previous-btn is-responsive" id="prev_button">
+              Prev
+            </button>
+            <button style="margin: 1%" class="v-button reset-btn is-responsive" id="reset_button"
+              onclick="location.reload()">
+              Reset
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="canvas-wrap" class="column is-8-desktop is-11-tablet is-12-mobile exp">
+      <canvas class="v-canvas-container" id="canvas" style="border: 2px solid black">
+      </canvas>
+      <div id="points"></div>
+    </div>
+
+    <div class="column is-2-desktop is-6-tablet is-10-mobile right">
+      <div class="v-datalist-container components-list">
+        <div class="v-datalist-title">Observations</div>
+        <div class="v-datalist-row">
+          <div id="observation-step-message" style="margin-bottom: 8px; color: #333; font-weight: bold;"></div>
+          <div id="text"></div>
+          <div id="logic_text"></div>
+          <div id="pointstat_text"></div>
+          <div id="linestat_text"></div>
+          <div class="v-table-wrap">
+            <table id="observations-table" class="table is-bordered is-fullwidth">
+              <thead id="table-head">
+                <tr>
+                  <th colspan="1">Key</th>
+                  <th colspan="1">Coordinates</th>
+                </tr>
+              </thead>
+              <tbody class="table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/virtual-labs/virtual-style@0.0.8-b/js/script.js"></script>
+<script src="../assets/js/iframeResize.js"></script>
+        
+        </body>
+
+</html>
