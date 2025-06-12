@@ -1,4 +1,4 @@
-# Cohen Sutherland's Line Clipping Algorithm 
+### Cohen Sutherland's Line Clipping Algorithm 
 * The Cohen–Sutherland algorithm is a line clipping algorithm used in computer graphics. After dividing a 2D space into 9 regions, the algorithm effectively identifies the lines and line segments that are visible in the viewport, which is the center region of interest.
 * The division of regions is based on a window defined by its maximum (x<sub>max</sub>, y<sub>max</sub>) and minimum (x<sub>min</sub>, y<sub>min</sub>) coordinates. One region represents the window itself, while the other 8 regions surround it, identified using a 4-digit binary code.
 
