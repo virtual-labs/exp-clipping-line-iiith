@@ -61,6 +61,22 @@ let pointsSoFar = 0;
 let pointMap = new Map();
 // map that tells whether or not to show the points
 let showPoints = new Map();
+let stepHistory = [];
+let currentStep = -1;
+
+// Add these with other global variables at the top
+let currentLine = 0;
+let status = 0;
+let isDark = 0;
+let firstPointStatus = 0;
+let currentPoint = 0;
+let intersection_x = undefined;
+let intersection_y = undefined;
+let text = document.getElementById("text");
+let logicText = document.getElementById("logic_text");
+let pointStatText = document.getElementById("pointstat_text");
+let lineStatText = document.getElementById("linestat_text");
+
 function formValidate(text, errorClass, elementId, minVal, maxVal) {
   const element = document.getElementById(elementId);
   const value = element.value;
@@ -408,85 +424,104 @@ function highlightEdge(edge, width, color) {
   }
 }
 function chooseCanvasMessage() {
-  const p1 = firstPoints[firstPoints.length - 1],
-    p2 = secondPoints[secondPoints.length - 1];
-  const code1 = encodePoint(p1[0], p1[1]);
-  const code2 = encodePoint(p2[0], p2[1]);
-  if (code1 == 0 && code2 == 0) {
-    MESSAGE = "Line is Clipped";
-    return;
-  } else if (code1 & code2) {
-    // both lie in the same region , no intersection with the rectangular grid
-    MESSAGE =
-      "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
-    return;
+  let message = "";
+  if (timesNextCalled === 0) {
+    message = "Starting line clipping.";
+    renderObservations(message);
+  } else if (timesNextCalled === 1) {
+    message = "Checking if points are inside the clipping window.";
+    renderObservations(message);
+  } else if (timesNextCalled === 2) {
+    message = "Computing intersection points.";
+    renderObservations(message);
+  } else if (timesNextCalled === 3) {
+    message = "Drawing the clipped line.";
+    renderObservations(message);
   } else {
-    const point_being_clipped = pointBeingClipped();
-    const option = timesNextCalled % 8;
-    const edge = clippingEdge();
-    if (option % 2 === 1) {
-      MESSAGE = `Clipping ${point_being_clipped} against ${edge} edge`;
-    } else {
-      MESSAGE = "";
-    }
+    message = "Clipping process complete.";
+    renderObservations(message);
   }
+  return message;
 }
 function handleNext() {
+  console.log("Next button clicked");
+  console.log("Current step:", currentStep, "Total steps:", stepHistory.length);
+  
+  if (!submit) {
+    alert("Please submit the coordinates first!");
+    return;
+  }
+  
+  timesNextCalled++;
+  const message = chooseCanvasMessage();
+  renderObservations(message);
+  
   if (timesNextCalled > 16) {
     return;
   }
+  
   const p1 = firstPoints[firstPoints.length - 1],
     p2 = secondPoints[secondPoints.length - 1];
   const code1 = encodePoint(p1[0], p1[1]);
   const code2 = encodePoint(p2[0], p2[1]);
+  
   if (code1 == 0 && code2 == 0) {
     MESSAGE = "Line is Clipped";
+    clipEdge = "Line is completely inside the clipping window";
+    renderObservations(MESSAGE);
+    saveState();
     return;
   } else if (code1 & code2) {
-    // both lie in the same region , no intersection with the rectangular grid
-
-    MESSAGE =
-      "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
+    MESSAGE = "Line Does Not Intersect With The Clipped Frame !! Line is Clipped .";
+    clipEdge = "Line is completely outside the clipping window";
+    renderObservations(MESSAGE);
+    saveState();
     return;
   } else {
     const point_being_clipped = pointBeingClipped();
     if (point_being_clipped === "point1") {
       const option = timesNextCalled % 8;
-      // at each odd frame highlight the edge being clipped against
       const edge = clippingEdge();
       if (option % 2 === 1) {
-        // highlight the edge being clipped against
-        clipEdge = edge;
+        clipEdge = `Clipping against ${edge}`;
+        MESSAGE = `Checking intersection with ${edge}`;
       } else {
         const intersection_point = clipPoint(p1, edge);
         if (intersection_point.length !== 0) {
           firstPoints.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
-        } else {
+          MESSAGE = `Found intersection point at (${Math.round(intersection_point[0])}, ${Math.round(intersection_point[1])})`;
         }
-        // unmark the previous highlight
         clipEdge = "";
       }
     } else if (point_being_clipped === "point2") {
       const option = timesNextCalled % 8;
       const edge = clippingEdge();
       if (option % 2 === 1) {
-        clipEdge = edge;
+        clipEdge = `Clipping against ${edge}`;
+        MESSAGE = `Checking intersection with ${edge}`;
       } else {
         const intersection_point = clipPoint(p2, edge);
         if (intersection_point.length !== 0) {
           secondPoints.push(intersection_point);
           const mapObject = `${intersection_point[0]},${intersection_point[1]}`;
           showPoints.set(mapObject, true);
-        } else {
+          MESSAGE = `Found intersection point at (${Math.round(intersection_point[0])}, ${Math.round(intersection_point[1])})`;
         }
         clipEdge = "";
       }
     }
+    renderObservations(MESSAGE);
   }
-  // clip the first point first
-  // next we clip the second point
+  
+  // Save state after all changes
+  saveState();
+  
+  // Redraw canvas with updated state
+  renderCanvas();
+  
+  console.log("Moved to next step:", currentStep);
 }
 function setParameters() {
   canvas.width = Math.floor(width * scale);
@@ -517,17 +552,46 @@ function setParameters() {
   secondPoints.push(point2);
   // check if the parameters are valid or not
 }
-function renderObservations() {
-  // render the observations
-  clearTable();
+function renderObservations(stepMessage) {
+  // Update the step message
+  const stepMsgDiv = document.getElementById("observation-step-message");
+  if (stepMsgDiv) {
+    stepMsgDiv.innerHTML = stepMessage || "";
+  }
+
+  // Update other observation elements
+  if (text) text.innerHTML = MESSAGE || "";
+  if (logicText) logicText.innerHTML = clipEdge || "";
+  if (pointStatText) pointStatText.innerHTML = pointBeingClipped() || "";
+  if (lineStatText) lineStatText.innerHTML = clippingEdge() || "";
+
+  // Update the observations table
   const table = document.getElementById("observations-table");
-  for (const [key, value] of pointMap) {
-    if (showPoints.get(key)) {
-      const coordinate = key.split(",");
-      const x = parseFloat(coordinate[0]).toFixed(2);
-      const y = parseFloat(coordinate[1]).toFixed(2);
-      const row = table.insertRow(-1);
-      row.innerHTML = `<td>${value}</td><td>(${x},${y})</td>`;
+  if (table) {
+    const tbody = table.querySelector('.table-body');
+    if (tbody) {
+      tbody.innerHTML = ""; // Clear previous observations
+      
+      // Add current point being clipped
+      if (point1 && point1.length > 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>Point 1</td><td>(${Math.round(point1[0])}, ${Math.round(point1[1])})</td>`;
+        tbody.appendChild(row);
+      }
+      
+      // Add second point
+      if (point2 && point2.length > 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>Point 2</td><td>(${Math.round(point2[0])}, ${Math.round(point2[1])})</td>`;
+        tbody.appendChild(row);
+      }
+      
+      // Add intersection point if it exists
+      if (intersection_x !== undefined && intersection_y !== undefined) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>Intersection</td><td>(${Math.round(intersection_x)}, ${Math.round(intersection_y)})</td>`;
+        tbody.appendChild(row);
+      }
     }
   }
 }
@@ -576,7 +640,6 @@ function renderCanvas() {
   );
   ctx.fillStyle = "black";
   renderObservations();
-  chooseCanvasMessage();
   canvasMessage(MESSAGE);
 }
 // handle the submit button
@@ -608,6 +671,7 @@ submitButton.addEventListener("click", function () {
   }
 });
 resetButton.addEventListener("click", function () {
+  console.log("Reset button clicked");
   // default values for the parameters
   clearDiv();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -625,6 +689,7 @@ resetButton.addEventListener("click", function () {
   showPoints = new Map();
   pointMap = new Map();
 });
+
 nextButton.addEventListener("click", function () {
   if (submit && timesNextCalled < 16) {
     if (timesNextCalled < 0) {
@@ -636,56 +701,116 @@ nextButton.addEventListener("click", function () {
     renderCanvas();
   }
 });
-previousButton.addEventListener("click", function () {
-  if (timesNextCalled >= 0) {
-    const point = pointBeingClipped();
-    const option = timesNextCalled % 8;
-    const edge = clippingEdge();
-    timesNextCalled--;
-    if (option % 2 === 1) {
-      // just chosen a point to render
-      clipEdge = edge;
-      if (point === "point1" && firstPoints.length > 1) {
-        const x = firstPoints[firstPoints.length - 1][0];
-        const y = firstPoints[firstPoints.length - 1][1];
-
-        if (edge === "LEFT" && x !== left) {
-        } else if (edge === "RIGHT" && x !== right) {
-        } else if (edge === "BOTTOM" && y !== down) {
-        } else if (edge === "TOP" && y !== up) {
-        } else {
-          const mapObject = `${x},${y}`;
-          showPoints.set(mapObject, false);
-          firstPoints.pop();
-        }
-      } else if (point === "point2" && secondPoints.length > 1) {
-        if (secondPoints[secondPoints.length - 1].length === 2) {
-          const x = secondPoints[secondPoints.length - 1][0];
-          const y = secondPoints[secondPoints.length - 1][1];
-          if (edge === "LEFT" && x !== left) {
-          } else if (edge === "RIGHT" && x !== right) {
-          } else if (edge === "BOTTOM" && y !== down) {
-          } else if (edge === "TOP" && y !== up) {
-          } else {
-            const mapObject = `${x},${y}`;
-            showPoints.set(mapObject, false);
-            secondPoints.pop();
-          }
-        }
-      }
-    } else {
-      // highlighted the edge
-      clipEdge = "";
-    }
-    console.log(timesNextCalled, point, edge, clipEdge);
-
-    renderCanvas();
-  }
+/* nextButton.addEventListener("click", () => {
+  console.log("Next button clicked");
+  check();
+}); */
+previousButton.addEventListener("click", () => {
+  console.log("Previous button clicked");
+  prev();
 });
 
 function init() {
   submitButton.click();
   renderCanvas();
+}
+
+function saveState() {
+  const state = {
+    currentLine,
+    status,
+    isDark,
+    firstPointStatus,
+    currentPoint,
+    intersection_x,
+    intersection_y,
+    point1: [...point1],
+    point2: [...point2],
+    MESSAGE,
+    clipEdge,
+    firstPoints: [...firstPoints],
+    secondPoints: [...secondPoints],
+    showPoints: new Map(showPoints),
+    timesNextCalled  // Save the next button click count
+  };
+  
+  // If we're going back and then making new changes, remove future steps
+  if (currentStep < stepHistory.length - 1) {
+    stepHistory = stepHistory.slice(0, currentStep + 1);
+  }
+  
+  stepHistory.push(state);
+  currentStep = stepHistory.length - 1;
+  
+  // Enable prev button
+  const prevButton = document.getElementById("prev_button");
+  if (prevButton) {
+    prevButton.disabled = false;
+    prevButton.style.opacity = "1";
+    prevButton.style.cursor = "pointer";
+    prevButton.style.pointerEvents = "auto";
+    prevButton.title = "Go to previous step";
+  }
+}
+
+function prev() {
+  console.log("Prev button clicked");
+  console.log("Current step:", currentStep, "Total steps:", stepHistory.length);
+  
+  if (currentStep <= 0) {
+    console.log("Already at the first step, can't go back");
+    // Disable prev button
+    const prevButton = document.getElementById("prev_button");
+    if (prevButton) {
+      prevButton.disabled = true;
+      prevButton.style.opacity = "0.5";
+      prevButton.style.cursor = "not-allowed";
+      prevButton.style.pointerEvents = "none";
+      prevButton.title = "Already at the first step";
+    }
+    // Update observation message
+    renderObservations("Already at the first step - Starting line clipping.");
+    return;
+  }
+  
+  // Enable prev button if it was disabled
+  const prevButton = document.getElementById("prev_button");
+  if (prevButton) {
+    prevButton.disabled = false;
+    prevButton.style.opacity = "1";
+    prevButton.style.cursor = "pointer";
+    prevButton.style.pointerEvents = "auto";
+    prevButton.title = "Go to previous step";
+  }
+  
+  // Go back one step
+  currentStep--;
+  const step = stepHistory[currentStep];
+  
+  // Restore the state from the step
+  currentLine = step.currentLine;
+  status = step.status;
+  isDark = step.isDark;
+  firstPointStatus = step.firstPointStatus;
+  currentPoint = step.currentPoint;
+  intersection_x = step.intersection_x;
+  intersection_y = step.intersection_y;
+  point1 = step.point1;
+  point2 = step.point2;
+  MESSAGE = step.MESSAGE;
+  clipEdge = step.clipEdge;
+  firstPoints = step.firstPoints;
+  secondPoints = step.secondPoints;
+  showPoints = new Map(step.showPoints);
+  timesNextCalled = step.timesNextCalled;
+  
+  // Update all observation elements
+  renderObservations(MESSAGE || "Starting line clipping.");
+  
+  // Redraw the canvas with the restored state
+  renderCanvas();
+  
+  console.log("State restored to step:", currentStep);
 }
 
 init();
